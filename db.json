@@ -1,38 +1,56 @@
 {
-    "users": [
-      { "id": 1, "name": "Moulya", "role": "admin" },
-      { "id": 2, "name": "Prerana", "role": "librarian" },
-      { "id": 3, "name": "Jayant", "role": "member" },
-      { "id": 4, "name": "Midhun", "role": "member" },
-      { "id": 5, "name": "Ravi", "role": "member" }
-    ],
-    "books": [
-      { "id": 1, "title": "The Alchemist", "author": "Paulo Coelho", "genre": "Fiction", "available": true },
-      { "id": 2, "title": "Clean Code", "author": "Robert C. Martin", "genre": "Programming", "available": false },
-      { "id": 3, "title": "1984", "author": "George Orwell", "genre": "Dystopian", "available": true },
-      { "id": 4, "title": "Atomic Habits", "author": "James Clear", "genre": "Self-help", "available": true },
-      { "id": 5, "title": "Deep Work", "author": "Cal Newport", "genre": "Productivity", "available": true },
-      { "id": 6, "title": "Sapiens", "author": "Yuval Noah Harari", "genre": "History", "available": true },
-      { "id": 7, "title": "Rich Dad Poor Dad", "author": "Robert Kiyosaki", "genre": "Finance", "available": true },
-      { "id": 8, "title": "The Pragmatic Programmer", "author": "Andrew Hunt", "genre": "Programming", "available": true },
-      { "id": 9, "title": "Harry Potter and the Sorcerer's Stone", "author": "J.K. Rowling", "genre": "Fantasy", "available": false },
-      { "id": 10, "title": "To Kill a Mockingbird", "author": "Harper Lee", "genre": "Classic", "available": true }
-    ],
-    "issuedBooks": [
-      {
-        "id": 1,
-        "bookId": 2,
-        "userId": 3,
-        "issueDate": "2025-08-01",
-        "returnDate": null
-      },
-      {
-        "id": 2,
-        "bookId": 9,
-        "userId": 2,
-        "issueDate": "2025-07-28",
-        "returnDate": null
-      }
-    ]
-  }
-  
+  "books": [
+    {
+      "id": "1",
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "available": false
+    },
+    {
+      "id": "2",
+      "title": "1984",
+      "author": "George Orwell",
+      "available": true
+    },
+    {
+      "id": "3",
+      "title": "To Kill a Mockingbird",
+      "author": "Harper Lee",
+      "available": true
+    },
+    {
+      "id": "4",
+      "title": "The Catcher in the Rye",
+      "author": "J.D. Salinger",
+      "available": true
+    },
+    {
+      "id": "5",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "available": true
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "name": "Alice"
+    },
+    {
+      "id": "2",
+      "name": "Bob"
+    },
+    {
+      "id": "3",
+      "name": "Charlie"
+    }
+  ],
+  "issuedBooks": [
+    {
+      "id": "3",
+      "userId": 2,
+      "bookId": 2,
+      "issueDate": "2025-07-20"
+    }
+  ]
+}
