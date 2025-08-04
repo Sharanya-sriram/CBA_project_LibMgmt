@@ -16,6 +16,7 @@ const api = {
   updateBook: (id, updatedBook) => API.put(`/books/${id}`, updatedBook),
   deleteBook: (id) => API.delete(`/books/${id}`),
   getIssuedBooks: () => API.get("/issuedBooks"),
+  deleteIssuedBook: (id) => API.delete(`/issuedBooks/${id}`),
 
   getUsers: () => API.get("/users"),
   getUser: (id) => API.get(`/users/${id}`),
