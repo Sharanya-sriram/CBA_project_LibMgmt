@@ -1,21 +1,38 @@
-import React from 'react'
-import Home from './pages/Home.jsx'
-import MyBooks from './pages/MyBooks.jsx'
-import { BrowserRouter, Routes, Route } from 'react-router'
-import Navbar from './components/Navbar.jsx'
-import './index.css'
-const App = () => {
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import { AuthProvider } from "./context/AuthContext.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import Home from "./pages/Home.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import MyBooks from "./pages/MyBooks.jsx";
+import MainLayout from "./components/MainLayout.jsx";
+function App() {
   return (
-    <>
-    <BrowserRouter>
-    <Navbar />
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/mybooks" element={<MyBooks />} />
-    </Routes>
-    </BrowserRouter>
-    </>
-  )
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+          <Route
+            path="/home"
+            element={<Home />}
+          />
+          <Route
+            path="/mybooks"
+            element={<MyBooks />}
+          />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
