@@ -50,18 +50,25 @@
     color: var(--primary);
   }
   
-  .login-btn {
-    padding: 6px 12px;
-    background-color: var(--primary);
+  
+  .logout-btn {
+    padding: 8px 16px;
+    background-color: #ff4b5c;
     color: white;
     border: none;
-    border-radius: 4px;
-    font-weight: 500;
+    border-radius: 20px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
-  .login-btn:hover {
-    background-color: var(--primary-light);
+  .logout-btn:hover {
+    background-color: #ff2e44;
+    transform: scale(1.05);
+  }
+  
+  .logout-btn:active {
+    transform: scale(0.97);
   }
   

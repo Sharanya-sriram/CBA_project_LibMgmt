@@ -1,13 +1,10 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState,useContext } from "react";
 
-// Create context
 export const AuthContext = createContext();
 
-// Auth Provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Hardcoded users for demo
   const usersDB = [
     { username: "user1", password: "password1" },
     { username: "user2", password: "password2" },
@@ -35,3 +32,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+export const useAuth = () => useContext(AuthContext);

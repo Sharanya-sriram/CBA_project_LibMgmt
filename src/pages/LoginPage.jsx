@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
@@ -14,7 +14,7 @@ const LoginPage = () => {
     e.preventDefault();
     const success = login(username, password);
     if (success) {
-      navigate("/dashboard");
+      navigate("/home");
     } else {
       setError("Invalid username or password");
     }

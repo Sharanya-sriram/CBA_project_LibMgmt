@@ -2,8 +2,9 @@
 import { useEffect, useState } from "react";
 import BookCard from "../components/BookCard";
 import api from "../api/http-common";
-
+import {useAuth} from '../context/AuthContext.jsx'
 const Home = () => {
+  const {user}=useAuth();
   const [stats, setStats] = useState({
     totalBooks: 0,
     availableBooks: 0,
@@ -52,7 +53,7 @@ const Home = () => {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h2>Welcome!</h2>
+      <h2>Welcome {user?user.username:""}!😊</h2>
       <h3>📊 Library Overview</h3>
       <ul>
         <li>Total Books: {stats.totalBooks}</li>
