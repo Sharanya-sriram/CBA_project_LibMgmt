@@ -8,12 +8,17 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import MyBooks from "./pages/MyBooks.jsx";
 import MainLayout from "./components/MainLayout.jsx";
 import BookDetails from "./pages/BookDetails.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
           <Route path="/" element={<LoginPage />} />
+          <Route
+            path="/admin"
+            element={<AdminDashboard />}
+          />
           <Route
             element={
               <ProtectedRoute>
@@ -33,6 +38,7 @@ function App() {
             path="/book/:id"
             element={<BookDetails />}
           />
+          
           </Route>
         </Routes>
       </Router>

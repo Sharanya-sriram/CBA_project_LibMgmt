@@ -3,7 +3,20 @@ const pool = require("../config/db");
 // Get all issued books
 exports.getAllIssuedBooks = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM issuedBooks");
+    const [rows] = await pool.query(`
+      SELECT 
+        ib.id AS issuedBookId,
+        ib.issueDate,
+        ib.returnDate,
+        u.id AS userId,
+        u.name AS userName,
+        b.id AS bookId,
+        b.title,
+        b.author
+      FROM issuedBooks ib
+      JOIN users u ON ib.userId = u.id
+      JOIN books b ON ib.bookId = b.id
+      ORDER BY ib.id DESC`);
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -105,3 +118,4 @@ exports.deleteIssuedBook = async (req, res) => {
     res.status(500).json({ message: "Failed to delete issued book" });
   }
 };
+

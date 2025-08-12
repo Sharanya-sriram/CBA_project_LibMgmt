@@ -33,6 +33,7 @@ const Home = () => {
         const availableBooks = booksData.filter((book) => book.available).length;
 
         setBooks(booksData);
+        
         setStats({
           totalBooks: booksData.length,
           availableBooks,

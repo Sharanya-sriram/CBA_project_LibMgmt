@@ -23,19 +23,28 @@ const BookDetails = () => {
 
   const handleIssue = async (copyId) => {
     try {
+      const issueDateObj = new Date();
+  
+      // Format to YYYY-MM-DD
+      const issueDate = issueDateObj.toISOString().split("T")[0];
+  
+      // Add 14 days
+      const returnDateObj = new Date(issueDateObj);
+      returnDateObj.setDate(returnDateObj.getDate() + 14);
+      const returnDate = returnDateObj.toISOString().split("T")[0];
+  
       const newIssue = {
         userId: user.id,
-        username: user.name,
         copyId,
         bookId: book.id,
-        issueDate: new Date().toISOString(),
-        
+        issueDate,
+        returnDate
       };
+  
       console.log(newIssue);
-      await api.addIssuedBook(newIssue); // ✅ Now matches your API style
+      await api.addIssuedBook(newIssue);
       alert(`✅ Book copy ${copyId} issued to you!`);
-
-      // Update local state so button becomes disabled
+  
       setBook((prev) => ({
         ...prev,
         copies: prev.copies.map((c) =>
@@ -46,6 +55,8 @@ const BookDetails = () => {
       console.error("❌ Failed to issue book:", err);
     }
   };
+  
+  
 
   if (!book) {
     return (

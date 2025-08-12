@@ -8,7 +8,7 @@ const BookCard = ({ book }) => {
   const bgClass = darkMode  ? "bg-gray-800" : "bg-white";
   const textClass = darkMode? "text-gray-100" : "text-gray-800";
   const subTextClass = darkMode? "text-gray-300" : "text-gray-600";
-  const stock=book.copies.map(copy => copy.available ? 1 : 0).reduce((a, b) => a + b, 0);
+  const stock=book.availableCopies;
 
   const handleClick=()=>{
     navigate(`/book/${book.id}`);

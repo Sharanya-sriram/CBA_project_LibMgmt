@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       (u) => u.username === username && u.password === password
     );
     if (matchedUser) {
-      setUser({ username: matchedUser.username,role:matchedUser.role });
+      setUser({ username: matchedUser.username,role:matchedUser.role,id:matchedUser.id });
       return true;
     } else {
       return false;
