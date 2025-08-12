@@ -1,20 +1,23 @@
 import React, { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../context/AuthContext.jsx";
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const { login } = useContext(AuthContext);
+  const { login,user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const success = login(username, password);
     if (success) {
-      navigate("/home");
+      if(user.role==="admin"){
+        navigate("/mybooks");
+      }else{
+        navigate("/home");
+      }
     } else {
       setError("Invalid username or password");
     }

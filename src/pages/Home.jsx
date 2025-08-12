@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import BookCard from "../components/BookCard";
 import api from "../api/http-common";
-import {useAuth} from '../context/AuthContext.jsx'
+import { useAuth } from "../context/AuthContext.jsx";
+
 const Home = () => {
-  const {user}=useAuth();
+  const { user, darkMode } = useAuth();
+
   const [stats, setStats] = useState({
     totalBooks: 0,
     availableBooks: 0,
@@ -13,7 +15,7 @@ const Home = () => {
   });
 
   const [books, setBooks] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // 🔍 search term
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,49 +47,67 @@ const Home = () => {
     fetchData();
   }, []);
 
-  // 🔍 filter logic (case-insensitive search)
-  const filteredBooks = books.filter((book) =>
-    book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    book.author.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBooks = books.filter(
+    (book) =>
+      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Welcome {user?user.username:""}!😊</h2>
-      <h3>📊 Library Overview</h3>
-      <ul>
-        <li>Total Books: {stats.totalBooks}</li>
-        <li>Available Books: {stats.availableBooks}</li>
-        <li>Issued Books: {stats.issuedBooks}</li>
-        <li>Total Users: {stats.totalUsers}</li>
-      </ul>
+    <div
+      className={`min-h-screen px-6 py-8 transition-colors duration-300 ${
+        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+      }`}
+    >
+      <h2 className="text-2xl font-bold mb-4">
+        Welcome {user ? user.username : ""}! 😊
+      </h2>
 
-      <h3>📚 All Books</h3>
+      {/* Stats Section */}
+      <h3 className="text-xl font-semibold mb-3">📊 Library Overview</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        {[
+          { label: "Total Books", value: stats.totalBooks },
+          { label: "Available Books", value: stats.availableBooks },
+          { label: "Issued Books", value: stats.issuedBooks },
+          { label: "Total Users", value: stats.totalUsers },
+        ].map((stat, idx) => (
+          <div
+            key={idx}
+            className={`p-4 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer ${
+              darkMode
+                ? "bg-gray-800 hover:bg-gray-700"
+                : "bg-white hover:bg-gray-100"
+            }`}
+          >
+            <p className="text-lg font-bold">{stat.value}</p>
+            <p className="text-sm opacity-80">{stat.label}</p>
+          </div>
+        ))}
+      </div>
 
-      {/* 🔍 Search bar */}
+      {/* Search */}
+      <h3 className="text-xl font-semibold mb-3">📚 All Books</h3>
       <input
         type="text"
         placeholder="Search by title or author"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        style={{
-          padding: "0.5rem",
-          marginBottom: "1rem",
-          width: "100%",
-          maxWidth: "400px",
-          borderRadius: "5px",
-          border: "1px solid #ccc"
-        }}
+        className={`w-full max-w-md p-2 rounded-md border mb-4 focus:outline-none focus:ring-2 transition ${
+          darkMode
+            ? "bg-gray-800 border-gray-700 text-gray-200 focus:ring-indigo-500"
+            : "bg-white border-gray-300 text-gray-900 focus:ring-indigo-400"
+        }`}
       />
 
-      {/* 🔍 Filtered results */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", marginTop: "1rem" }}>
+      {/* Book Cards */}
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredBooks.length > 0 ? (
           filteredBooks.map((book) => (
             <BookCard key={book.id} book={book} />
           ))
         ) : (
-          <p>No books found.</p>
+          <p className="col-span-full text-center text-lg">No books found.</p>
         )}
       </div>
     </div>
