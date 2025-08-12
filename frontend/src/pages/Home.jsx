@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import { useEffect, useState } from "react";
-import BookCard from "../components/BookCard";
-import api from "../api/http-common";
+import BookCard from "../components/BookCard.jsx";
+import api from "../api/http-common.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const Home = () => {
