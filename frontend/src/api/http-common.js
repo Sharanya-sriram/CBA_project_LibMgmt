@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:3001", // json-server base
+  baseURL: "http://localhost:5000/api", // Backend API base
   headers: {
     "Content-Type": "application/json",
   },
@@ -16,13 +16,18 @@ const api = {
   updateBook: (id, updatedBook) => API.put(`/books/${id}`, updatedBook),
   deleteBook: (id) => API.delete(`/books/${id}`),
 
-  // Copies update only
-  updateBookCopies: (id, copies) =>
-    API.patch(`/books/${id}`, { copies }),
+  // Copies
+  getCopies: () => API.get("/copies"),
+  getCopiesByBookId: (bookId) => API.get(`/copies/book/${bookId}`),
+  addCopy: (copy) => API.post("/copies", copy),
+  updateCopy: (id, updatedCopy) => API.put(`/copies/${id}`, updatedCopy),
+  deleteCopy: (id) => API.delete(`/copies/${id}`),
 
   // Issued books
   getIssuedBooks: () => API.get("/issuedBooks"),
+  getIssuedBook: (id) => API.get(`/issuedBooks/${id}`),
   addIssuedBook: (issuedBook) => API.post("/issuedBooks", issuedBook),
+  updateIssuedBook: (id, updatedIssuedBook) => API.put(`/issuedBooks/${id}`, updatedIssuedBook),
   deleteIssuedBook: (id) => API.delete(`/issuedBooks/${id}`),
 
   // Users

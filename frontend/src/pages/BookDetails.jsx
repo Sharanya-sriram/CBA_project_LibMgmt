@@ -25,15 +25,15 @@ const BookDetails = () => {
     try {
       const newIssue = {
         userId: user.id,
-        username: user.name,
+        bookId: parseInt(id),
         copyId,
-        bookId: book.id,
-        issueDate: new Date().toISOString(),
-        
+        issueDate: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
+        returnDate: null
       };
-      console.log(newIssue);
-      await api.addIssuedBook(newIssue); // ✅ Now matches your API style
-      alert(`✅ Book copy ${copyId} issued to you!`);
+      
+      console.log("Issuing book:", newIssue);
+      await api.addIssuedBook(newIssue);
+      alert(`✅ Book copy ${copyId} issued successfully!`);
 
       // Update local state so button becomes disabled
       setBook((prev) => ({
@@ -44,6 +44,7 @@ const BookDetails = () => {
       }));
     } catch (err) {
       console.error("❌ Failed to issue book:", err);
+      alert("Failed to issue book. Please try again.");
     }
   };
 

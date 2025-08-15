@@ -1,37 +1,104 @@
-import React, { createContext, useState,useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import api from "../api/http-common";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
-  const usersDB = [
-    { username: "user1", password: "password1",role:"admin",id:'1' },
-    { username: "user2", password: "password2" ,role:"user",id:'2'},
-  ];
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    // Apply dark mode to document
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
   const toggleDarkMode = () => {
     setDarkMode(prevMode => !prevMode);
-  }
-  const login = (username, password) => {
-    const matchedUser = usersDB.find(
-      (u) => u.username === username && u.password === password
-    );
-    if (matchedUser) {
-      setUser({ username: matchedUser.username,role:matchedUser.role });
-      return true;
-    } else {
+  };
+
+  const login = async (username, password) => {
+    try {
+      const response = await api.getUsers();
+      const users = response.data;
+      
+      const matchedUser = users.find(
+        (u) => u.username === username && u.password === password
+      );
+      
+      if (matchedUser) {
+        const userData = {
+          id: matchedUser.id,
+          username: matchedUser.username,
+          name: matchedUser.name,
+          email: matchedUser.email,
+          role: matchedUser.role
+        };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('Login error:', error);
       return false;
     }
   };
 
+
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('user');
+  };
+
+  const isAdmin = () => {
+    return user?.role === 'admin';
+  };
+
+  const isUser = () => {
+    return user?.role === 'user';
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout,darkMode,toggleDarkMode }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      darkMode, 
+      toggleDarkMode, 
+      loading,
+      isAdmin,
+      isUser
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
-export const useAuth = () => useContext(AuthContext);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

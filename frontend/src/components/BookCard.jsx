@@ -1,47 +1,155 @@
-// src/components/BookCard.jsx
+import React from "react";
 import { useAuth } from "../context/AuthContext.jsx";
-import BookDetails from "../pages/BookDetails.jsx";
 import { useNavigate } from "react-router-dom";
-const BookCard = ({ book }) => {
-  const { darkMode } = useAuth(); // 'light' or 'dark'
-  const navigate = useNavigate();
-  const bgClass = darkMode  ? "bg-gray-800" : "bg-white";
-  const textClass = darkMode? "text-gray-100" : "text-gray-800";
-  const subTextClass = darkMode? "text-gray-300" : "text-gray-600";
-  const stock=book.copies.map(copy => copy.available ? 1 : 0).reduce((a, b) => a + b, 0);
+import { BookOpenIcon, CalendarIcon, UserIcon } from "@heroicons/react/24/outline";
+import Card from "./common/Card";
+import Badge from "./common/Badge";
+import Button from "./common/Button";
 
-  const handleClick=()=>{
-    navigate(`/book/${book.id}`);
-  }
+const BookCard = ({ book, showActions = true, className = "" }) => {
+  const { darkMode } = useAuth();
+  const navigate = useNavigate();
+  
+  // Mock data for demo - replace with actual book data
+  const bookData = {
+    id: book?.id || 1,
+    title: book?.title || "Sample Book Title",
+    author: book?.author || "Unknown Author",
+    genre: book?.genre || "Fiction",
+    publicationDate: book?.publicationDate || "2023-01-01",
+    description: book?.description || "A wonderful book description...",
+    copies: book?.copies || [{ available: true }, { available: false }],
+    rating: book?.rating || 4.5,
+    totalCopies: book?.copies?.length || 2
+  };
+
+  const availableCopies = bookData.copies?.filter(copy => copy.available).length || 0;
+  const isAvailable = availableCopies > 0;
+
+  const handleViewDetails = () => {
+    navigate(`/book/${bookData.id}`);
+  };
+
+  const handleIssueBook = (e) => {
+    e.stopPropagation();
+    // Add issue book logic here
+    console.log("Issue book:", bookData.id);
+  };
+
+  // Generate book cover colors based on genre
+  const getCoverColor = (genre) => {
+    const colors = {
+      'Fiction': 'from-blue-500 to-purple-600',
+      'Science': 'from-green-500 to-teal-600',
+      'History': 'from-amber-500 to-orange-600',
+      'Biography': 'from-pink-500 to-rose-600',
+      'Fantasy': 'from-purple-500 to-indigo-600',
+      'Romance': 'from-rose-500 to-pink-600',
+      'Mystery': 'from-gray-600 to-gray-800',
+      'default': 'from-indigo-500 to-blue-600'
+    };
+    return colors[genre] || colors.default;
+  };
+
   return (
-    <div
-      className={`${bgClass} rounded-xl shadow-md p-4 w-64
-                  hover:shadow-lg hover:-translate-y-1 transition-transform duration-200`}
-     onClick={handleClick}>
-      <div className="flex justify-between items-start">
-        <h3 className={`text-lg font-semibold ${textClass}`}>{book.title}</h3>
-        <span
-          className={`text-xs font-bold px-2 py-1 rounded ${
-            stock>0
-              ? darkMode
-                ? "bg-green-900 text-green-200"
-                : "bg-green-100 text-green-700"
-              : darkMode
-                ? "bg-red-900 text-red-200"
-                : "bg-red-100 text-red-700"
-          }`}
-        >
-          {stock>0 ? "Available" : "Out of stock"}
-        </span>
+    <Card 
+      hover={true} 
+      className={`group cursor-pointer ${className}`}
+      onClick={handleViewDetails}
+    >
+      {/* Book Cover */}
+      <div className={`relative h-48 rounded-lg bg-gradient-to-br ${getCoverColor(bookData.genre)} mb-4 overflow-hidden`}>
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <BookOpenIcon className="w-16 h-16 text-white/80" />
+        </div>
+        
+        {/* Availability Badge */}
+        <div className="absolute top-3 right-3">
+          <Badge 
+            variant={isAvailable ? "success" : "danger"} 
+            size="sm"
+            className="font-bold"
+          >
+            {isAvailable ? `${availableCopies} Available` : "Out of Stock"}
+          </Badge>
+        </div>
+
+        {/* Rating */}
+        <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1">
+          <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          <span className="text-white text-sm font-medium">{bookData.rating}</span>
+        </div>
       </div>
 
-      <p className={`text-sm ${subTextClass} mt-2`}>
-        <strong>Author:</strong> {book.author}
-      </p>
-      <p className={`text-sm ${subTextClass}`}>
-        <strong>Genre:</strong> {book.genre}
-      </p>
-    </div>
+      {/* Book Info */}
+      <div className="space-y-3">
+        <div>
+          <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200 line-clamp-2">
+            {bookData.title}
+          </h3>
+          
+          <div className="flex items-center gap-2 mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <UserIcon className="w-4 h-4" />
+            <span className="font-medium">{bookData.author}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Badge variant="primary" size="sm">
+            {bookData.genre}
+          </Badge>
+          
+          <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <CalendarIcon className="w-3 h-3" />
+            <span>{new Date(bookData.publicationDate).getFullYear()}</span>
+          </div>
+        </div>
+
+        {/* Description Preview */}
+        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+          {bookData.description}
+        </p>
+
+        {/* Actions */}
+        {showActions && (
+          <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex gap-2">
+              <Button
+                variant="primary"
+                size="sm"
+                className="flex-1"
+                onClick={handleViewDetails}
+              >
+                View Details
+              </Button>
+              
+              {isAvailable && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleIssueBook}
+                  className="text-emerald-600 border-emerald-600 hover:bg-emerald-50"
+                >
+                  Issue Book
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Quick Stats */}
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2">
+          <span>{bookData.totalCopies} total copies</span>
+          <span className="flex items-center gap-1">
+            <div className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+            {isAvailable ? 'Available' : 'Unavailable'}
+          </span>
+        </div>
+      </div>
+    </Card>
   );
 };
 

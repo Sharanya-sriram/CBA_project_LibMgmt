@@ -1,4 +1,4 @@
-CREATE DATABASE libmgmt;
+-- Database will be created by Docker environment variables
 USE libmgmt;
 CREATE TABLE books (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -99,5 +99,5 @@ INSERT INTO books (id, title, author, genre, publicationDate, description) VALUE
 (20, 'The Hunger Games', 'Suzanne Collins', 'Dystopian', '2008-09-14', 'A dystopian novel about survival and rebellion.');
 ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT 'user';
 INSERT INTO users (name, username, password, age, college, email, role) VALUES
-('Admin One', 'admin1', 'hashed_password', NULL, NULL, 'admin1@example.com', 'admin'),
-('Admin Two', 'admin2', 'hashed_password', NULL, NULL, 'admin2@example.com', 'admin');
+('User One', 'user1', 'user1', 22, 'Demo College', 'user1@example.com', 'user'),
+('User Two', 'user2', 'user2', 24, 'Demo College', 'user2@example.com', 'admin');
