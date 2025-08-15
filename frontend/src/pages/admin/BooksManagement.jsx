@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import {
   BookOpenIcon,
@@ -20,6 +20,103 @@ import Modal from "../../components/common/Modal.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import SearchBar from "../../components/common/SearchBar.jsx";
 import api from "../../api/http-common.js";
+
+// BookForm component moved outside to prevent re-creation
+const BookForm = React.memo(({ title, bookForm, onFormChange, onSubmit, onCancel, genres }) => (
+  <div className="space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Input
+        label="Title"
+        value={bookForm.title}
+        onChange={(e) => onFormChange('title', e.target.value)}
+        placeholder="Enter book title"
+        required
+      />
+      <Input
+        label="Author"
+        value={bookForm.author}
+        onChange={(e) => onFormChange('author', e.target.value)}
+        placeholder="Enter author name"
+        required
+      />
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Genre
+        </label>
+        <select
+          value={bookForm.genre}
+          onChange={(e) => onFormChange('genre', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          required
+        >
+          <option value="">Select genre</option>
+          {genres.map(genre => (
+            <option key={genre} value={genre}>{genre}</option>
+          ))}
+        </select>
+      </div>
+      <Input
+        label="Publication Date"
+        type="date"
+        value={bookForm.publicationDate}
+        onChange={(e) => onFormChange('publicationDate', e.target.value)}
+        required
+      />
+      <Input
+        label="Pages"
+        type="number"
+        value={bookForm.pages}
+        onChange={(e) => onFormChange('pages', e.target.value)}
+        placeholder="Number of pages"
+        required
+      />
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Input
+        label="ISBN"
+        value={bookForm.isbn}
+        onChange={(e) => onFormChange('isbn', e.target.value)}
+        placeholder="978-0-123456-78-9"
+        required
+      />
+      <Input
+        label="Number of Copies"
+        type="number"
+        min="1"
+        value={bookForm.copies}
+        onChange={(e) => onFormChange('copies', e.target.value)}
+        required
+      />
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Description
+      </label>
+      <textarea
+        value={bookForm.description}
+        onChange={(e) => onFormChange('description', e.target.value)}
+        placeholder="Enter book description"
+        rows={4}
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+        required
+      />
+    </div>
+
+    <div className="flex gap-3 pt-4">
+      <Button variant="primary" onClick={onSubmit} className="flex-1">
+        {title === "Add New Book" ? "Add Book" : "Update Book"}
+      </Button>
+      <Button variant="outline" onClick={onCancel} className="flex-1">
+        Cancel
+      </Button>
+    </div>
+  </div>
+));
 
 const BooksManagement = () => {
   const { user } = useAuth();
@@ -44,6 +141,11 @@ const BooksManagement = () => {
     pages: "",
     copies: 1
   });
+
+  // Memoized form handlers to prevent cursor issues
+  const handleFormChange = useCallback((field, value) => {
+    setBookForm(prev => ({ ...prev, [field]: value }));
+  }, []);
 
   // Mock books data
   const mockBooks = [
@@ -135,7 +237,7 @@ const BooksManagement = () => {
     return matchesSearch && matchesGenre;
   });
 
-  const handleAddBook = async () => {
+  const handleAddBook = useCallback(async () => {
     try {
       // Create book in backend
       const bookData = {
@@ -172,9 +274,9 @@ const BooksManagement = () => {
       console.error("Failed to add book:", error);
       alert("❌ Failed to add book. Please try again.");
     }
-  };
+  }, [bookForm]);
 
-  const handleEditBook = async () => {
+  const handleEditBook = useCallback(async () => {
     try {
       const bookData = {
         title: bookForm.title,
@@ -197,7 +299,7 @@ const BooksManagement = () => {
       console.error("Failed to update book:", error);
       alert("❌ Failed to update book. Please try again.");
     }
-  };
+  }, [bookForm, selectedBook]);
 
   const handleDeleteBook = async () => {
     try {
@@ -224,7 +326,7 @@ const BooksManagement = () => {
     }
   };
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setBookForm({
       title: "",
       author: "",
@@ -235,7 +337,7 @@ const BooksManagement = () => {
       pages: "",
       copies: 1
     });
-  };
+  }, []);
 
   const openEditModal = (book) => {
     setSelectedBook(book);
@@ -323,101 +425,6 @@ const BooksManagement = () => {
     </tr>
   );
 
-  const BookForm = ({ title, onSubmit, onCancel }) => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Title"
-          value={bookForm.title}
-          onChange={(e) => setBookForm({ ...bookForm, title: e.target.value })}
-          placeholder="Enter book title"
-          required
-        />
-        <Input
-          label="Author"
-          value={bookForm.author}
-          onChange={(e) => setBookForm({ ...bookForm, author: e.target.value })}
-          placeholder="Enter author name"
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Genre
-          </label>
-          <select
-            value={bookForm.genre}
-            onChange={(e) => setBookForm({ ...bookForm, genre: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-            required
-          >
-            <option value="">Select genre</option>
-            {genres.map(genre => (
-              <option key={genre} value={genre}>{genre}</option>
-            ))}
-          </select>
-        </div>
-        <Input
-          label="Publication Date"
-          type="date"
-          value={bookForm.publicationDate}
-          onChange={(e) => setBookForm({ ...bookForm, publicationDate: e.target.value })}
-          required
-        />
-        <Input
-          label="Pages"
-          type="number"
-          value={bookForm.pages}
-          onChange={(e) => setBookForm({ ...bookForm, pages: e.target.value })}
-          placeholder="Number of pages"
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="ISBN"
-          value={bookForm.isbn}
-          onChange={(e) => setBookForm({ ...bookForm, isbn: e.target.value })}
-          placeholder="978-0-123456-78-9"
-          required
-        />
-        <Input
-          label="Number of Copies"
-          type="number"
-          min="1"
-          value={bookForm.copies}
-          onChange={(e) => setBookForm({ ...bookForm, copies: e.target.value })}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Description
-        </label>
-        <textarea
-          value={bookForm.description}
-          onChange={(e) => setBookForm({ ...bookForm, description: e.target.value })}
-          placeholder="Enter book description"
-          rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-          required
-        />
-      </div>
-
-      <div className="flex gap-3 pt-4">
-        <Button variant="primary" onClick={onSubmit} className="flex-1">
-          {title === "Add New Book" ? "Add Book" : "Update Book"}
-        </Button>
-        <Button variant="outline" onClick={onCancel} className="flex-1">
-          Cancel
-        </Button>
-      </div>
-    </div>
-  );
 
   if (loading) {
     return (
@@ -585,8 +592,11 @@ const BooksManagement = () => {
         >
           <BookForm
             title="Add New Book"
+            bookForm={bookForm}
+            onFormChange={handleFormChange}
             onSubmit={handleAddBook}
             onCancel={() => { setShowAddModal(false); resetForm(); }}
+            genres={genres}
           />
         </Modal>
 
@@ -599,8 +609,11 @@ const BooksManagement = () => {
         >
           <BookForm
             title="Edit Book"
+            bookForm={bookForm}
+            onFormChange={handleFormChange}
             onSubmit={handleEditBook}
             onCancel={() => { setShowEditModal(false); setSelectedBook(null); resetForm(); }}
+            genres={genres}
           />
         </Modal>
 

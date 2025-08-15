@@ -36,6 +36,7 @@ const api = {
   addUser: (user) => API.post("/users", user),
   updateUser: (id, updatedUser) => API.put(`/users/${id}`, updatedUser),
   deleteUser: (id) => API.delete(`/users/${id}`),
+  loginUser: (credentials) => API.post("/users/login", credentials),
 };
 
 export default api;

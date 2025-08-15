@@ -38,21 +38,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await api.getUsers();
-      const users = response.data;
+      const response = await api.loginUser({ username, password });
       
-      const matchedUser = users.find(
-        (u) => u.username === username && u.password === password
-      );
-      
-      if (matchedUser) {
-        const userData = {
-          id: matchedUser.id,
-          username: matchedUser.username,
-          name: matchedUser.name,
-          email: matchedUser.email,
-          role: matchedUser.role
-        };
+      if (response.data.success) {
+        const userData = response.data.user;
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
         return true;

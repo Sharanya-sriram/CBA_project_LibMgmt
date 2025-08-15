@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 import {
   BookOpenIcon,
   UserGroupIcon,
@@ -23,6 +24,7 @@ import api from "../../api/http-common.js";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("7days");
 
@@ -269,11 +271,11 @@ const AdminDashboard = () => {
     );
   };
 
-  const QuickAction = ({ icon: Icon, title, description, action, color = "indigo" }) => {
+  const QuickAction = ({ icon: Icon, title, description, action, color = "indigo", onClick }) => {
     const colorClasses = getColorClasses(color);
     
     return (
-      <Card className="group hover:shadow-md transition-shadow duration-200 cursor-pointer">
+      <Card className="group hover:shadow-md transition-shadow duration-200 cursor-pointer" onClick={onClick}>
         <div className="flex items-center gap-4">
           <div className={`p-3 rounded-xl ${colorClasses.bg} group-hover:scale-110 transition-transform duration-200`}>
             <Icon className={`w-6 h-6 ${colorClasses.text}`} />
@@ -416,24 +418,28 @@ const AdminDashboard = () => {
                   title="Add New Book"
                   description="Add books to the catalog"
                   color="indigo"
+                  onClick={() => navigate('/admin/books')}
                 />
                 <QuickAction
                   icon={UserGroupIcon}
                   title="Register User"
                   description="Add new library member"
                   color="emerald"
+                  onClick={() => navigate('/admin/users')}
                 />
                 <QuickAction
                   icon={ClockIcon}
                   title="Issue Book"
                   description="Issue book to member"
                   color="amber"
+                  onClick={() => navigate('/admin/issues')}
                 />
                 <QuickAction
                   icon={ChartBarIcon}
                   title="View Reports"
                   description="Generate detailed reports"
                   color="purple"
+                  onClick={() => navigate('/admin/reports')}
                 />
               </div>
             </Card>

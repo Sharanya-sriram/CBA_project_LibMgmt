@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import {
   UserGroupIcon,
@@ -18,6 +18,85 @@ import Modal from "../../components/common/Modal.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import SearchBar from "../../components/common/SearchBar.jsx";
 import api from "../../api/http-common.js";
+
+// UserForm component moved outside to prevent re-creation
+const UserForm = React.memo(({ title, userForm, onFormChange, onSubmit, onCancel }) => (
+  <div className="space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Input
+        label="Full Name"
+        value={userForm.name}
+        onChange={(e) => onFormChange('name', e.target.value)}
+        placeholder="Enter full name"
+        required
+      />
+      <Input
+        label="Username"
+        value={userForm.username}
+        onChange={(e) => onFormChange('username', e.target.value)}
+        placeholder="Enter username"
+        required
+      />
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Input
+        label="Email"
+        type="email"
+        value={userForm.email}
+        onChange={(e) => onFormChange('email', e.target.value)}
+        placeholder="Enter email address"
+      />
+      <Input
+        label={title === "Edit User" ? "New Password (leave blank to keep current)" : "Password"}
+        type="password"
+        value={userForm.password}
+        onChange={(e) => onFormChange('password', e.target.value)}
+        placeholder="Enter password"
+        required={title !== "Edit User"}
+      />
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Input
+        label="Age"
+        type="number"
+        value={userForm.age}
+        onChange={(e) => onFormChange('age', e.target.value)}
+        placeholder="Enter age"
+      />
+      <Input
+        label="College"
+        value={userForm.college}
+        onChange={(e) => onFormChange('college', e.target.value)}
+        placeholder="Enter college name"
+      />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Role
+        </label>
+        <select
+          value={userForm.role}
+          onChange={(e) => onFormChange('role', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          required
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+
+    <div className="flex gap-3 pt-4">
+      <Button variant="primary" onClick={onSubmit} className="flex-1">
+        {title === "Add New User" ? "Add User" : "Update User"}
+      </Button>
+      <Button variant="outline" onClick={onCancel} className="flex-1">
+        Cancel
+      </Button>
+    </div>
+  </div>
+));
 
 const UserManagement = () => {
   const { user: currentUser } = useAuth();
@@ -40,6 +119,11 @@ const UserManagement = () => {
     college: "",
     role: "user"
   });
+
+  // Memoized form handlers to prevent cursor issues
+  const handleFormChange = useCallback((field, value) => {
+    setUserForm(prev => ({ ...prev, [field]: value }));
+  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -66,7 +150,7 @@ const UserManagement = () => {
     return matchesSearch && matchesRole;
   });
 
-  const handleAddUser = async () => {
+  const handleAddUser = useCallback(async () => {
     try {
       const userData = {
         ...userForm,
@@ -83,9 +167,9 @@ const UserManagement = () => {
       console.error("Failed to add user:", error);
       alert("❌ Failed to add user. Please try again.");
     }
-  };
+  }, [userForm]);
 
-  const handleEditUser = async () => {
+  const handleEditUser = useCallback(async () => {
     try {
       const userData = {
         ...userForm,
@@ -108,7 +192,7 @@ const UserManagement = () => {
       console.error("Failed to update user:", error);
       alert("❌ Failed to update user. Please try again.");
     }
-  };
+  }, [userForm, selectedUser]);
 
   const handleDeleteUser = async () => {
     try {
@@ -124,7 +208,7 @@ const UserManagement = () => {
     }
   };
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setUserForm({
       name: "",
       username: "",
@@ -134,7 +218,7 @@ const UserManagement = () => {
       college: "",
       role: "user"
     });
-  };
+  }, []);
 
   const openEditModal = (user) => {
     setSelectedUser(user);
@@ -217,83 +301,6 @@ const UserManagement = () => {
     </tr>
   );
 
-  const UserForm = ({ title, onSubmit, onCancel }) => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Full Name"
-          value={userForm.name}
-          onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
-          placeholder="Enter full name"
-          required
-        />
-        <Input
-          label="Username"
-          value={userForm.username}
-          onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
-          placeholder="Enter username"
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Email"
-          type="email"
-          value={userForm.email}
-          onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-          placeholder="Enter email address"
-        />
-        <Input
-          label={title === "Edit User" ? "New Password (leave blank to keep current)" : "Password"}
-          type="password"
-          value={userForm.password}
-          onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-          placeholder="Enter password"
-          required={title !== "Edit User"}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Input
-          label="Age"
-          type="number"
-          value={userForm.age}
-          onChange={(e) => setUserForm({ ...userForm, age: e.target.value })}
-          placeholder="Enter age"
-        />
-        <Input
-          label="College"
-          value={userForm.college}
-          onChange={(e) => setUserForm({ ...userForm, college: e.target.value })}
-          placeholder="Enter college name"
-        />
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Role
-          </label>
-          <select
-            value={userForm.role}
-            onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-            required
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="flex gap-3 pt-4">
-        <Button variant="primary" onClick={onSubmit} className="flex-1">
-          {title === "Add New User" ? "Add User" : "Update User"}
-        </Button>
-        <Button variant="outline" onClick={onCancel} className="flex-1">
-          Cancel
-        </Button>
-      </div>
-    </div>
-  );
 
   if (loading) {
     return (
@@ -434,6 +441,8 @@ const UserManagement = () => {
         >
           <UserForm
             title="Add New User"
+            userForm={userForm}
+            onFormChange={handleFormChange}
             onSubmit={handleAddUser}
             onCancel={() => { setShowAddModal(false); resetForm(); }}
           />
@@ -448,6 +457,8 @@ const UserManagement = () => {
         >
           <UserForm
             title="Edit User"
+            userForm={userForm}
+            onFormChange={handleFormChange}
             onSubmit={handleEditUser}
             onCancel={() => { setShowEditModal(false); setSelectedUser(null); resetForm(); }}
           />

@@ -72,3 +72,33 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: "Failed to delete user" });
   }
 };
+
+// Login user
+exports.loginUser = async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const [[user]] = await pool.query(
+      `SELECT ${selectFields} FROM users WHERE username = ? AND password = ?`,
+      [username, password]
+    );
+    
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    
+    // Return user data without password
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Login failed" });
+  }
+};

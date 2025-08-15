@@ -1,27 +1,61 @@
-version: '3.8'
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+  mysql:
+    image: mysql:8.0
+    container_name: libmgmt_mysql
+    restart: always
     environment:
-      - NODE_ENV=development
-    depends_on:
-      - backend
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: libmgmt
+      MYSQL_USER: libuser
+      MYSQL_PASSWORD: libpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/sqldb.txt:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - libmgmt_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
+    container_name: libmgmt_backend
+    restart: always
     ports:
       - "5000:5000"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=development
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=libuser
+      - DB_PASSWORD=libpassword
+      - DB_NAME=libmgmt
+      - PORT=5000
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - libmgmt_network
+
+  frontend:
+    build: ./frontend
+    container_name: libmgmt_frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - libmgmt_network
+    environment:
+      - VITE_API_URL=http://localhost:5000
+
+volumes:
+  mysql_data:
+
+networks:
+  libmgmt_network:
+    driver: bridge
