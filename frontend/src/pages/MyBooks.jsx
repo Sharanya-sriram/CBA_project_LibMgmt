@@ -3,7 +3,7 @@ import BookCard from "../components/BookCard";
 import api from "../api/http-common";
 
 const MyBooks = () => {
-  const userId = 2; // assumed user
+  const userId = 1; // assumed user
   const [myBooks, setMyBooks] = useState([]);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const MyBooks = () => {
                   issueDate: entry.issueDate,
                   returnDate: entry.returnDate
                 }
-              : null;
+              : 1;
           })
           .filter(Boolean);
 
