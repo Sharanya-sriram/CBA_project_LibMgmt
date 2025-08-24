@@ -34,6 +34,7 @@ const IssueManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
+  const [availableCopies, setAvailableCopies] = useState([]);
 
   // Form state for issuing books
   const [issueForm, setIssueForm] = useState({
@@ -42,11 +43,28 @@ const IssueManagement = () => {
     copyId: "",
     issueDate: new Date().toISOString().split('T')[0]
   });
-
+  useEffect(() => {
+    if (!issueForm.bookId) return;
+  
+    const fetchCopies = async () => {
+      const copies = await getAvailableCopies(issueForm.bookId);
+      setAvailableCopies(copies);
+    };
+  
+    fetchCopies();
+  }, [issueForm.bookId]);
   useEffect(() => {
     fetchData();
   }, []);
-
+  const getCopies=async (bookId)=>{
+    try {
+      const response = await api.getCopiesByBookId(bookId);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch copies:", error);
+      return [];
+    }
+  }
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -166,9 +184,9 @@ const IssueManagement = () => {
     });
   };
 
-  const getAvailableCopies = (bookId) => {
-    const book = books.find(b => b.id === parseInt(bookId));
-    return book?.copies?.filter(copy => copy.available) || [];
+  const getAvailableCopies =async (bookId) => {
+    const copies=await getCopies(bookId);
+    return copies?.filter(copy => copy.available) || [];
   };
 
   const IssueRow = ({ issue, index }) => (
@@ -505,7 +523,7 @@ const IssueManagement = () => {
                   disabled={!issueForm.bookId}
                 >
                   <option value="">Select copy</option>
-                  {getAvailableCopies(issueForm.bookId).map(copy => (
+                  {availableCopies.map(copy => (
                     <option key={copy.copyId} value={copy.copyId}>
                       {copy.copyId}
                     </option>

@@ -196,7 +196,21 @@ const BooksManagement = () => {
     }
   ];
 
-  const genres = ["Fiction", "Science Fiction", "Romance", "Fantasy", "History", "Biography", "Mystery", "Horror"];
+  const genres = [
+    "all",
+    "Classic",
+    "Dystopian",
+    "Romance",
+    "Adventure",
+    "Historical",
+    "Fantasy",
+    "Psychological",
+    "Philosophical",
+    "Political Satire",
+    "Thriller",
+    "Drama",
+    "Horror",
+  ];
 
   useEffect(() => {
     fetchBooks();
@@ -450,18 +464,7 @@ const BooksManagement = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                icon={<ArrowDownTrayIcon className="w-4 h-4" />}
-              >
-                Export
-              </Button>
-              <Button
-                variant="outline"
-                icon={<ArrowUpTrayIcon className="w-4 h-4" />}
-              >
-                Import
-              </Button>
+              
               <Button
                 variant="primary"
                 icon={<PlusIcon className="w-4 h-4" />}

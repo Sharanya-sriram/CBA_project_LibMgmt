@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const booksController = require("../controllers/booksController");
+const authMiddleware = require("../middleware/auth");
+
+router.use(authMiddleware);
 
 // Get all books
 router.get("/", booksController.getAllBooks);

@@ -15,7 +15,7 @@ import UserManagement from "./pages/admin/UserManagement.jsx";
 import IssueManagement from "./pages/admin/IssueManagement.jsx";
 import CopyManagement from "./pages/admin/CopyManagement.jsx";
 import UserProfile from "./pages/UserProfile.jsx";
-
+import RegisterPage from "./pages/RegisterPage.jsx";
 function App() {
   return (
     <AuthProvider>
@@ -23,6 +23,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route
             element={
               <ProtectedRoute>

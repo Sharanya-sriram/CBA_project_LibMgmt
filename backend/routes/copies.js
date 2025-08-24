@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const copiesController = require("../controllers/copiesController");
+const authMiddleware = require("../middleware/auth");
 
+router.use(authMiddleware);
 // Get all copies
 router.get("/", copiesController.getAllCopies);
 

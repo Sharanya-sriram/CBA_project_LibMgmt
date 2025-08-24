@@ -125,7 +125,7 @@ const Navbar = () => {
             )}
 
             {/* Theme Toggle */}
-            <button
+            {/* <button
               onClick={toggleDarkMode}
               aria-label="Toggle theme"
               className={`p-2 rounded-lg transition-all duration-300 transform hover:scale-110 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
@@ -135,7 +135,7 @@ const Navbar = () => {
               ) : (
                 <MoonIcon className="h-5 w-5 text-indigo-500" />
               )}
-            </button>
+            </button> */}
 
             {/* Logout Button */}
             {user && (

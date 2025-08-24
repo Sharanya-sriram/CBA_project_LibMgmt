@@ -22,34 +22,36 @@ const BookCard = ({ book, showActions = true, className = "" }) => {
     rating: book?.rating || 4.5,
     totalCopies: book?.copies?.length || 2
   };
-
-  const availableCopies = bookData.copies?.filter(copy => copy.available).length || 0;
+  const availableCopies = bookData.copies?.filter(copy => Number(copy.available) === 1).length || 0;
+  bookData.copies
   const isAvailable = availableCopies > 0;
+  
 
   const handleViewDetails = () => {
     navigate(`/book/${bookData.id}`);
   };
 
-  const handleIssueBook = (e) => {
-    e.stopPropagation();
-    // Add issue book logic here
-    console.log("Issue book:", bookData.id);
-  };
 
   // Generate book cover colors based on genre
   const getCoverColor = (genre) => {
     const colors = {
-      'Fiction': 'from-blue-500 to-purple-600',
-      'Science': 'from-green-500 to-teal-600',
-      'History': 'from-amber-500 to-orange-600',
-      'Biography': 'from-pink-500 to-rose-600',
-      'Fantasy': 'from-purple-500 to-indigo-600',
+      'Classic': 'from-yellow-600 to-amber-700',
+      'Dystopian': 'from-gray-700 to-gray-900',
       'Romance': 'from-rose-500 to-pink-600',
-      'Mystery': 'from-gray-600 to-gray-800',
+      'Adventure': 'from-blue-500 to-cyan-600',
+      'Historical': 'from-amber-500 to-orange-600',
+      'Fantasy': 'from-purple-500 to-indigo-600',
+      'Psychological': 'from-emerald-600 to-teal-700',
+      'Philosophical': 'from-indigo-600 to-sky-700',
+      'Political Satire': 'from-red-500 to-orange-600',
+      'Thriller': 'from-gray-800 to-black',
+      'Drama': 'from-pink-600 to-purple-600',
+      'Horror': 'from-red-700 to-black',
       'default': 'from-indigo-500 to-blue-600'
     };
     return colors[genre] || colors.default;
   };
+  
 
   return (
     <Card 
@@ -126,16 +128,7 @@ const BookCard = ({ book, showActions = true, className = "" }) => {
                 View Details
               </Button>
               
-              {isAvailable && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleIssueBook}
-                  className="text-emerald-600 border-emerald-600 hover:bg-emerald-50"
-                >
-                  Issue Book
-                </Button>
-              )}
+              
             </div>
           </div>
         )}

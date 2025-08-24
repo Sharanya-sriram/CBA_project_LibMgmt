@@ -184,7 +184,7 @@ const AdminDashboard = () => {
     return colorMap[color] || colorMap.indigo;
   };
 
-  const StatCard = ({ icon: Icon, title, value, change, changeType, color, action }) => {
+  const StatCard = ({ icon: Icon, title, value, change, changeType, color, action,todo=null }) => {
     const colorClasses = getColorClasses(color);
     
     return (
@@ -214,7 +214,7 @@ const AdminDashboard = () => {
             
             {action && (
               <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <Button size="sm" variant="outline" className="text-xs">
+                <Button size="sm" variant="outline" className="text-xs" onClick={todo}>
                   {action}
                 </Button>
               </div>
@@ -313,21 +313,7 @@ const AdminDashboard = () => {
               </p>
             </div>
             
-            <div className="flex items-center gap-3">
-              <select
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-              >
-                <option value="7days">Last 7 days</option>
-                <option value="30days">Last 30 days</option>
-                <option value="90days">Last 90 days</option>
-              </select>
-              
-              <Button variant="primary" icon={<PlusIcon className="w-4 h-4" />}>
-                Quick Add
-              </Button>
-            </div>
+            
           </div>
         </div>
 
@@ -341,6 +327,7 @@ const AdminDashboard = () => {
             changeType="positive"
             color="indigo"
             action="Manage Books"
+            todo={()=>navigate("/admin/books")}
           />
           <StatCard
             icon={UserGroupIcon}
@@ -350,6 +337,8 @@ const AdminDashboard = () => {
             changeType="positive"
             color="emerald"
             action="View Users"
+            todo={()=>navigate("/admin/users")}
+
           />
           <StatCard
             icon={ClockIcon}
@@ -359,6 +348,7 @@ const AdminDashboard = () => {
             changeType="negative"
             color="amber"
             action="Issue Management"
+            todo={()=>navigate("/admin/issues")}
           />
           <StatCard
             icon={ExclamationTriangleIcon}
@@ -368,6 +358,7 @@ const AdminDashboard = () => {
             changeType="negative"
             color="red"
             action="Send Reminders"
+            todo={()=>navigate("/admin/users")}
           />
         </div>
 
@@ -380,9 +371,7 @@ const AdminDashboard = () => {
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   📚 Popular Genres
                 </h2>
-                <Button variant="outline" size="sm" icon={<EyeIcon className="w-4 h-4" />}>
-                  View Details
-                </Button>
+                
               </div>
               
               <div className="space-y-4">
@@ -477,7 +466,7 @@ const AdminDashboard = () => {
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   📊 Recent Activity
                 </h3>
-                <Button variant="ghost" size="sm">View All</Button>
+                
               </div>
               
               <div className="space-y-1">

@@ -13,6 +13,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend/sqldb.txt:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/populate.sql:/docker-entrypoint-initdb.d/populate.sql
     networks:
       - libmgmt_network
     healthcheck:
@@ -24,16 +25,10 @@ services:
     build: ./backend
     container_name: libmgmt_backend
     restart: always
+    env_file:
+    - ./backend/.env
     ports:
       - "5000:5000"
-    environment:
-      - NODE_ENV=development
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=libuser
-      - DB_PASSWORD=libpassword
-      - DB_NAME=libmgmt
-      - PORT=5000
     depends_on:
       mysql:
         condition: service_healthy
