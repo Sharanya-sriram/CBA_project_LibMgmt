@@ -410,13 +410,7 @@ const Home = () => {
                 >
                   My Issued Books
                 </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  icon={<CalendarIcon className="w-4 h-4" />}
-                >
-                  Reservation History
-                </Button>
+                
               </div>
             </Card>
           </div>

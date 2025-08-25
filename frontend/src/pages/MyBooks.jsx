@@ -129,6 +129,7 @@ const MyBooks = () => {
     try {
       await api.updateIssuedBook(selectedBook.id, {
         ...selectedBook,
+        issueDate:new Date(selectedBook.issueDate).toISOString().split('T')[0],
         returnDate: new Date().toISOString().split('T')[0]
       });
       setMyBooks(prev => prev.filter(book => book.id !== selectedBook.id));

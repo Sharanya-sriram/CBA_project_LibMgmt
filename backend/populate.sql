@@ -51,19 +51,5 @@ INSERT INTO copies (bookId, copyId, available) VALUES
 (20, 'HUNGER-1', TRUE),
 (20, 'HUNGER-2', FALSE);
 
-INSERT INTO users (id, name, username, password, age, college, email) VALUES
-(1, 'Alice', 'alice01', 'hashed_password_1', 22, 'XYZ University', 'alice@example.com'),
-(2, 'Bob', 'bob02', 'hashed_password_2', 24, 'ABC College', 'bob@example.com'),
-(3, 'Charlie', 'charlie03', 'hashed_password_3', 21, 'PQR Institute', 'charlie@example.com'),
-(4, 'David', 'david04', 'hashed_password_4', 23, 'LMN University', 'david@example.com'),
-(5, 'Emma', 'emma05', 'hashed_password_5', 25, 'UVW College', 'emma@example.com');
 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'user';
-
-INSERT INTO users (name, username, password, age, college, email, role) VALUES
-('User One', 'user1', 'user1', 22, 'Demo College', 'user1@example.com', 'user'),
-('User Two', 'user2', 'user2', 24, 'Demo College', 'user2@example.com', 'admin');
-
-INSERT INTO issuedBooks (id, userId, bookId, copyId, issueDate, returnDate) VALUES
-(1, 2, 1, 'GATSBY-1', '2025-07-20', '2025-08-03'),
-(2, 2, 8, 'HOBBIT-2', '2025-08-05', '2025-08-19');

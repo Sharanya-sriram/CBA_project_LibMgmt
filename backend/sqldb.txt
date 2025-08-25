@@ -46,6 +46,8 @@ CREATE TABLE issuedBooks (
 );
 
 -- Insert only the 2 essential users for login (as shown on login page)
+ INSERT INTO users (name, username, password, age, college, email, role) VALUES
+('Main Admin', 'Main_Admin', '$2b$10$5x4jGdSCPH.KXhXNicSYreWVDqr0p51XJbXpTsQiESZMvkft2Vgga', NULL, NULL, NULL, 'admin');
+
 INSERT INTO users (name, username, password, age, college, email, role) VALUES
-('User One', 'user1', 'user1', 22, 'Demo College', 'user1@example.com', 'user'),
-('User Two', 'user2', 'user2', 24, 'Demo College', 'user2@example.com', 'admin');
+('Meghana', 'megs', '$2b$10$LVewxrAh/HCFAgQCQE.xTueydryyoM8EBAo1tQ9xprMkG1V88StDS', 22, 'DSATM College', 'megs@example.com', 'user'); 

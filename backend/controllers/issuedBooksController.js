@@ -58,10 +58,13 @@ exports.updateIssuedBook = async (req, res) => {
 
   try {
     // Update issuedBooks table
+    const modIssueDate = issueDate ? new Date(issueDate).toISOString().slice(0, 10) : null;
+    console.log(modIssueDate);
     const [result] = await pool.query(
       `UPDATE issuedBooks SET userId = ?, bookId = ?, copyId = ?, issueDate = ?, returnDate = ? WHERE id = ?`,
-      [userId, bookId, copyId, issueDate, returnDate, id]
+      [userId, bookId, copyId, modIssueDate, returnDate, id]
     );
+
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Issued book not found" });
