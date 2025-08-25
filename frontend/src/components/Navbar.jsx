@@ -72,17 +72,7 @@ const Navbar = () => {
 
           {/* right */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={toggleDarkMode}
-              aria-label="Toggle theme"
-              className={`p-2 rounded-full ${buttonBg} transform transition-all duration-500 hover:rotate-12`}
-            >
-              {darkMode ? (
-                <SunIcon className="h-6 w-6 text-yellow-300" />
-              ) : (
-                <MoonIcon className="h-6 w-6 text-indigo-500" />
-              )}
-            </button>
+            
 
             {user && (
               <button
