@@ -1,0 +1,326 @@
+{
+  "books": [
+    {
+      "id": "1",
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "genre": "Classic",
+      "copies": [
+        {
+          "copyId": "GATSBY-1",
+          "available": false
+        },
+        {
+          "copyId": "GATSBY-2",
+          "available": true
+        }
+      ],
+      "available": true
+    },
+    {
+      "id": "2",
+      "title": "1984",
+      "author": "George Orwell",
+      "genre": "Dystopian",
+      "copies": [
+        {
+          "copyId": "1984-1",
+          "available": true
+        },
+        {
+          "copyId": "1984-2",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "title": "To Kill a Mockingbird",
+      "author": "Harper Lee",
+      "genre": "Classic",
+      "copies": [
+        {
+          "copyId": "TKAM-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "title": "The Catcher in the Rye",
+      "author": "J.D. Salinger",
+      "genre": "Classic",
+      "copies": [
+        {
+          "copyId": "CATCHER-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "genre": "Romance",
+      "copies": [
+        {
+          "copyId": "PRIDE-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "title": "Moby Dick",
+      "author": "Herman Melville",
+      "genre": "Adventure",
+      "copies": [
+        {
+          "copyId": "MOBY-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "title": "War and Peace",
+      "author": "Leo Tolstoy",
+      "genre": "Historical",
+      "copies": [
+        {
+          "copyId": "WARPEACE-1",
+          "available": true
+        },
+        {
+          "copyId": "WARPEACE-2",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "title": "The Hobbit",
+      "author": "J.R.R. Tolkien",
+      "genre": "Fantasy",
+      "copies": [
+        {
+          "copyId": "HOBBIT-1",
+          "available": true
+        },
+        {
+          "copyId": "HOBBIT-2",
+          "available": false
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "title": "Brave New World",
+      "author": "Aldous Huxley",
+      "genre": "Dystopian",
+      "copies": [
+        {
+          "copyId": "BRAVE-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "title": "Crime and Punishment",
+      "author": "Fyodor Dostoevsky",
+      "genre": "Psychological",
+      "copies": [
+        {
+          "copyId": "CRIME-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "title": "The Alchemist",
+      "author": "Paulo Coelho",
+      "genre": "Philosophical",
+      "copies": [
+        {
+          "copyId": "ALCHEMIST-1",
+          "available": true
+        },
+        {
+          "copyId": "ALCHEMIST-2",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "title": "The Lord of the Rings",
+      "author": "J.R.R. Tolkien",
+      "genre": "Fantasy",
+      "copies": [
+        {
+          "copyId": "LOTR-1",
+          "available": true
+        },
+        {
+          "copyId": "LOTR-2",
+          "available": false
+        },
+        {
+          "copyId": "LOTR-3",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "title": "Fahrenheit 451",
+      "author": "Ray Bradbury",
+      "genre": "Dystopian",
+      "copies": [
+        {
+          "copyId": "FAHRENHEIT-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "title": "Jane Eyre",
+      "author": "Charlotte Brontë",
+      "genre": "Romance",
+      "copies": [
+        {
+          "copyId": "JANE-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "title": "Animal Farm",
+      "author": "George Orwell",
+      "genre": "Political Satire",
+      "copies": [
+        {
+          "copyId": "ANIMAL-1",
+          "available": true
+        },
+        {
+          "copyId": "ANIMAL-2",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "title": "The Da Vinci Code",
+      "author": "Dan Brown",
+      "genre": "Thriller",
+      "copies": [
+        {
+          "copyId": "DAVINCI-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "title": "The Kite Runner",
+      "author": "Khaled Hosseini",
+      "genre": "Drama",
+      "copies": [
+        {
+          "copyId": "KITE-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "title": "A Tale of Two Cities",
+      "author": "Charles Dickens",
+      "genre": "Historical",
+      "copies": [
+        {
+          "copyId": "TALE-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "title": "The Shining",
+      "author": "Stephen King",
+      "genre": "Horror",
+      "copies": [
+        {
+          "copyId": "SHINING-1",
+          "available": true
+        }
+      ]
+    },
+    {
+      "id": "20",
+      "title": "The Hunger Games",
+      "author": "Suzanne Collins",
+      "genre": "Dystopian",
+      "copies": [
+        {
+          "copyId": "HUNGER-1",
+          "available": true
+        },
+        {
+          "copyId": "HUNGER-2",
+          "available": false
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "name": "Alice"
+    },
+    {
+      "id": "2",
+      "name": "Bob"
+    },
+    {
+      "id": "3",
+      "name": "Charlie"
+    },
+    {
+      "id": "4",
+      "name": "David"
+    },
+    {
+      "id": "5",
+      "name": "Emma"
+    }
+  ],
+  "issuedBooks": [
+    {
+      "id": "2",
+      "userId": "2",
+      "bookId": "8",
+      "copyId": "HOBBIT-2",
+      "issueDate": "2025-08-05",
+      "returnDate": "2025-08-19"
+    },
+    {
+      "id": "49d2",
+      "copyId": "GATSBY-2",
+      "bookId": "1",
+      "issueDate": "2025-08-12T05:32:20.488Z",
+      "returnDate": "2025-08-10"
+    },
+    {
+      "id": "fded",
+      "copyId": "1984-1",
+      "bookId": "2",
+      "issueDate": "2025-08-12T05:40:21.370Z"
+    }
+  ]
+}

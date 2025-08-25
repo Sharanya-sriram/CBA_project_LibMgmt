@@ -1,0 +1,74 @@
+:root {
+    --primary: #1e3a8a;         /* deep blue */
+    --primary-light: #3b82f6;   /* light blue */
+    --bg: #ffffff;
+    --text: #1f2937;
+    --hover-bg: #e0e7ff;
+    --active-bg: #c7d2fe;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1.5rem;
+    background-color: var(--bg);
+    border-bottom: 1px solid #e5e7eb;
+    height: 55px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  
+  .brand {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-right: 1rem;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: var(--hover-bg);
+  }
+  
+  .nav-link.active {
+    background-color: var(--active-bg);
+    color: var(--primary);
+  }
+  
+  
+  .logout-btn {
+    padding: 8px 16px;
+    background-color: #ff4b5c;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logout-btn:hover {
+    background-color: #ff2e44;
+    transform: scale(1.05);
+  }
+  
+  .logout-btn:active {
+    transform: scale(0.97);
+  }
+  
