@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("darkMode");
-    return saved ? JSON.parse(saved) : false;
+    return saved==='true' ? JSON.parse(saved) : false;
   });
   const [loading, setLoading] = useState(true);
   const fetchCurrentUser = async () => {
@@ -28,10 +28,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
-      document.documentElement.setAttribute("data-theme", "dark");
+      
     } else {
       document.documentElement.classList.remove("dark");
-      document.documentElement.setAttribute("data-theme", "light");
+      
     }
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
