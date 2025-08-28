@@ -1,95 +1,53 @@
-const pool = require("../config/db");
-
-// Validation helper
-const validateCopyData = ({ bookId, copyId }) => {
-  if (!bookId || !copyId) {
-    return false;
-  }
-  return true;
-};
+const Copy = require("../models/Copy");
 
 // Get all copies
 exports.getAllCopies = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM copies");
-    res.json(rows);
+    const copies = await Copy.find().populate("bookId");
+    res.json(copies);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to get copies" });
+    res.status(500).json({ error: err.message });
   }
 };
 
-// Get copies by book ID
+// Get copies by bookId
 exports.getCopiesByBook = async (req, res) => {
-  const { bookId } = req.params;
   try {
-    const [rows] = await pool.query("SELECT * FROM copies WHERE bookId = ?", [bookId]);
-    res.json(rows);
+    const copies = await Copy.find({ bookId: req.params.bookId }).populate("bookId");
+    res.json(copies);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to get copies for book" });
+    res.status(500).json({ error: err.message });
   }
 };
 
-// Create a new copy
+// Add a new copy
 exports.createCopy = async (req, res) => {
-  const { bookId, copyId, available = 1 } = req.body;
-
-  if (!validateCopyData({ bookId, copyId })) {
-    return res.status(400).json({ message: "bookId and copyId are required" });
-  }
-
   try {
-    const [result] = await pool.query(
-      "INSERT INTO copies (bookId, copyId, available) VALUES (?, ?, ?)",
-      [bookId, copyId, available ? 1 : 0]
-    );
-    res.status(201).json({ id: result.insertId, message: "Copy created" });
+    const { bookId, status } = req.body;
+    const copy = new Copy({ bookId, status });
+    await copy.save();
+    res.status(201).json(copy);
   } catch (err) {
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.status(409).json({ message: "CopyId already exists" });
-    }
-    console.error(err);
-    res.status(500).json({ message: "Failed to create copy" });
+    res.status(400).json({ error: err.message });
   }
 };
 
-// Update a copy
+// Update a copy by id
 exports.updateCopy = async (req, res) => {
-  const { id } = req.params;
-  const { bookId, copyId, available } = req.body;
-
-  if (!validateCopyData({ bookId, copyId })) {
-    return res.status(400).json({ message: "bookId and copyId are required" });
-  }
-
   try {
-    const [result] = await pool.query(
-      "UPDATE copies SET bookId = ?, copyId = ?, available = ? WHERE id = ?",
-      [bookId, copyId, available ? 1 : 0, id]
-    );
-    if (result.affectedRows === 0)
-      return res.status(404).json({ message: "Copy not found" });
-    res.json({ message: "Copy updated" });
+    const copy = await Copy.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(copy);
   } catch (err) {
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.status(409).json({ message: "CopyId already exists" });
-    }
-    console.error(err);
-    res.status(500).json({ message: "Failed to update copy" });
+    res.status(400).json({ error: err.message });
   }
 };
 
-// Delete a copy
+// Delete a copy by id
 exports.deleteCopy = async (req, res) => {
-  const { id } = req.params;
   try {
-    const [result] = await pool.query("DELETE FROM copies WHERE id = ?", [id]);
-    if (result.affectedRows === 0)
-      return res.status(404).json({ message: "Copy not found" });
+    await Copy.findByIdAndDelete(req.params.id);
     res.json({ message: "Copy deleted" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to delete copy" });
+    res.status(500).json({ error: err.message });
   }
 };

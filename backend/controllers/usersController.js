@@ -1,12 +1,10 @@
-const pool = require("../config/db");
-
-const selectFields = "id, name, username, age, college, email, createdAt, role";
+const User = require("../models/User");
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
-    const [rows] = await pool.query(`SELECT ${selectFields} FROM users`);
-    res.json(rows);
+    const users = await User.find({}, "-password"); // exclude password
+    res.json(users);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to get users" });
@@ -17,7 +15,7 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
   try {
-    const [[user]] = await pool.query(`SELECT ${selectFields} FROM users WHERE id = ?`, [id]);
+    const user = await User.findById(id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (err) {
@@ -30,11 +28,18 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
   const { name, username, password, age, college, email, role } = req.body;
   try {
-    const [result] = await pool.query(
-      "INSERT INTO users (name, username, password, age, college, email, role) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [name, username, password, age, college, email, role || 'user']
-    );
-    res.status(201).json({ id: result.insertId, message: "User created" });
+    const newUser = new User({
+      name,
+      username,
+      password,
+      age,
+      college,
+      email,
+      role: role || "user",
+    });
+
+    await newUser.save();
+    res.status(201).json({ id: newUser._id, message: "User created" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to create user" });
@@ -44,15 +49,15 @@ exports.createUser = async (req, res) => {
 // Update a user
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { name, username, password, age, college, email, role } = req.body;
   try {
-    const [result] = await pool.query(
-      "UPDATE users SET name = ?, username = ?, password = ?, age = ?, college = ?, email = ?, role = ? WHERE id = ?",
-      [name, username, password, age, college, email, role || 'user', id]
-    );
-    if (result.affectedRows === 0)
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+    }).select("-password");
+
+    if (!updatedUser)
       return res.status(404).json({ message: "User not found" });
-    res.json({ message: "User updated" });
+
+    res.json({ message: "User updated", user: updatedUser });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to update user" });
@@ -63,8 +68,8 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const [result] = await pool.query("DELETE FROM users WHERE id = ?", [id]);
-    if (result.affectedRows === 0)
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser)
       return res.status(404).json({ message: "User not found" });
     res.json({ message: "User deleted" });
   } catch (err) {
@@ -77,25 +82,17 @@ exports.deleteUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   const { username, password } = req.body;
   try {
-    const [[user]] = await pool.query(
-      `SELECT ${selectFields} FROM users WHERE username = ? AND password = ?`,
-      [username, password]
+    const user = await User.findOne({ username, password }).select(
+      "id username name email role"
     );
-    
+
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    
-    // Return user data without password
+
     res.json({
       success: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      user,
     });
   } catch (err) {
     console.error(err);
