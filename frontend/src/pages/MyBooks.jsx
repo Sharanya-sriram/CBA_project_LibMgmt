@@ -157,37 +157,44 @@ const MyBooks = () => {
   const BookCard = ({ book }) => (
     <Card className="overflow-hidden">
       <div className="flex gap-4">
-        <div className={`w-20 h-28 rounded-lg bg-gradient-to-br ${book.coverColor} flex items-center justify-center flex-shrink-0`}>
+        <div
+          className={`w-20 h-28 rounded-lg bg-gradient-to-br ${book.coverColor} flex items-center justify-center flex-shrink-0`}
+        >
           <BookOpenIcon className="w-8 h-8 text-white" />
         </div>
-
+  
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <h3 className={`font-bold text-lg ${darkMode ? "text-white" : "text-gray-900"} line-clamp-1`}>
+              <h3 className="font-bold text-lg text-white dark:text-gray-900 line-clamp-1">
                 {book.title}
               </h3>
-              <p className={darkMode ? "text-gray-400" : "text-gray-600"}>by {book.author}</p>
+              <p className="text-gray-600 dark:text-gray-400">by {book.author}</p>
               <Badge variant="primary" size="sm" className="mt-1">
                 {book.genre}
               </Badge>
             </div>
             {getStatusBadge(book)}
           </div>
-
+  
           <div className="space-y-2 mb-4">
-            <div className={`flex items-center gap-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <CalendarIcon className="w-4 h-4" />
               <span>Issued: {new Date(book.issueDate).toLocaleDateString()}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <ClockIcon className="w-4 h-4" />
-              <span className={isOverdue(book.dueDate) ? "text-red-600 font-medium" : (darkMode ? "text-gray-400" : "text-gray-600")}>
+              <span
+                className={`${
+                  isOverdue(book.dueDate)
+                    ? "text-red-600 font-medium"
+                    : "text-gray-600 dark:text-gray-400"
+                }`}
+              >
                 Due: {new Date(book.dueDate).toLocaleDateString()}
-                {isOverdue(book.dueDate) 
+                {isOverdue(book.dueDate)
                   ? ` (${Math.abs(getDaysRemaining(book.dueDate))} days overdue)`
-                  : ` (${getDaysRemaining(book.dueDate)} days remaining)`
-                }
+                  : ` (${getDaysRemaining(book.dueDate)} days remaining)`}
               </span>
             </div>
             {book.fine > 0 && (
@@ -196,12 +203,14 @@ const MyBooks = () => {
                 <span className="font-medium">Fine: ${book.fine.toFixed(2)}</span>
               </div>
             )}
-            <div className={`flex items-center gap-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <ArrowPathIcon className="w-4 h-4" />
-              <span>Renewals: {book.renewalCount}/{book.maxRenewals}</span>
+              <span>
+                Renewals: {book.renewalCount}/{book.maxRenewals}
+              </span>
             </div>
           </div>
-
+  
           <div className="flex gap-2">
             <Button size="sm" variant="danger" onClick={() => handleReturnBook(book)}>
               Return Book
@@ -211,19 +220,22 @@ const MyBooks = () => {
                 Renew
               </Button>
             )}
-            <Button size="sm" variant="ghost">Details</Button>
+            <Button size="sm" variant="ghost">
+              Details
+            </Button>
           </div>
         </div>
       </div>
     </Card>
   );
+  
 
   const overdueBooks = myBooks.filter(book => book.status === "overdue");
   const totalFines = myBooks.reduce((sum, book) => sum + book.fine, 0);
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+      <div className={`min-h-screen flex items-center justify-center bg-gray-900 dark:bg-gray-50`}>
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -233,67 +245,75 @@ const MyBooks = () => {
     <div className="transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className={`text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
             📚 My Library
           </h1>
-          <p className={darkMode ? "text-gray-400" : "text-gray-600"}>
+          <p className="text-gray-600 dark:text-gray-400">
             Manage your borrowed books
           </p>
         </div>
-
+  
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${darkMode ? "bg-indigo-900/20" : "bg-indigo-100"}`}>
-                <BookOpenIcon className={`w-6 h-6 ${darkMode ? "text-indigo-400" : "text-indigo-600"}`} />
+              <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/20">
+                <BookOpenIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div>
-                <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>{myBooks.length}</p>
-                <p className={darkMode ? "text-gray-400" : "text-gray-600"}>Current Books</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {myBooks.length}
+                </p>
+                <p className="text-gray-600 dark:text-gray-400">Current Books</p>
               </div>
             </div>
           </Card>
-
+  
           <Card>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${darkMode ? "bg-red-900/20" : "bg-red-100"}`}>
-                <ExclamationTriangleIcon className={`w-6 h-6 ${darkMode ? "text-red-400" : "text-red-600"}`} />
+              <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/20">
+                <ExclamationTriangleIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>{overdueBooks.length}</p>
-                <p className={darkMode ? "text-gray-400" : "text-gray-600"}>Overdue</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {overdueBooks.length}
+                </p>
+                <p className="text-gray-600 dark:text-gray-400">Overdue</p>
               </div>
             </div>
           </Card>
-
+  
           <Card>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${darkMode ? "bg-amber-900/20" : "bg-amber-100"}`}>
-                <InformationCircleIcon className={`w-6 h-6 ${darkMode ? "text-amber-400" : "text-amber-600"}`} />
+              <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/20">
+                <InformationCircleIcon className="w-6 h-6 text-amber-600 dark:text-amber-400" />
               </div>
               <div>
-                <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>${totalFines.toFixed(2)}</p>
-                <p className={darkMode ? "text-gray-400" : "text-gray-600"}>Total Fines</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  ${totalFines.toFixed(2)}
+                </p>
+                <p className="text-gray-600 dark:text-gray-400">Total Fines</p>
               </div>
             </div>
           </Card>
         </div>
-
+  
         <div className="space-y-6">
           {myBooks.length > 0 ? (
             myBooks.map(book => <BookCard key={book.id} book={book} />)
           ) : (
             <Card className="text-center py-12">
               <BookOpenIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className={`text-lg font-medium mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+              <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-white">
                 No books currently borrowed
               </h3>
-              <p className={darkMode ? "text-gray-400" : "text-gray-500"}>Visit the catalog to discover and borrow books</p>
+              <p className="text-gray-500 dark:text-gray-400">
+                Visit the catalog to discover and borrow books
+              </p>
               <Button variant="primary" className="mt-4">Browse Catalog</Button>
             </Card>
           )}
         </div>
-
+  
         <Modal
           isOpen={showReturnModal}
           onClose={() => setShowReturnModal(false)}
@@ -301,18 +321,18 @@ const MyBooks = () => {
         >
           {selectedBook && (
             <div className="space-y-4">
-              <p className={darkMode ? "text-gray-400" : "text-gray-600"}>
+              <p className="text-gray-600 dark:text-gray-400">
                 Are you sure you want to return "<strong>{selectedBook.title}</strong>"?
               </p>
               {selectedBook.fine > 0 && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-700">
                   <div className="flex items-center gap-2">
-                    <ExclamationTriangleIcon className="w-5 h-5 text-red-600" />
-                    <span className="font-medium text-red-800">
+                    <ExclamationTriangleIcon className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    <span className="font-medium text-red-800 dark:text-red-200">
                       Outstanding Fine: ${selectedBook.fine.toFixed(2)}
                     </span>
                   </div>
-                  <p className="text-sm text-red-700 mt-1">
+                  <p className="text-sm text-red-700 dark:text-red-300 mt-1">
                     Please settle this fine at the library counter.
                   </p>
                 </div>
@@ -331,6 +351,7 @@ const MyBooks = () => {
       </div>
     </div>
   );
+  
 };
 
 export default MyBooks;
