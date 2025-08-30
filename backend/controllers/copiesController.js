@@ -23,14 +23,21 @@ exports.getCopiesByBook = async (req, res) => {
 // Add a new copy
 exports.createCopy = async (req, res) => {
   try {
-    const { bookId, status } = req.body;
-    const copy = new Copy({ bookId, status });
+    const { bookId, copyId, available } = req.body;
+
+    const copy = new Copy({
+      bookId,
+      copyId,         // required by schema
+      available,      // optional, defaults to true
+    });
+
     await copy.save();
     res.status(201).json(copy);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
+
 
 // Update a copy by id
 exports.updateCopy = async (req, res) => {

@@ -2,9 +2,9 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const pool = require("../config/db"); // your MySQL pool/connection
+// const pool = require("../config/db"); // your MySQL pool/connection
 const dotenv = require("dotenv");
-
+const User = require("../models/User");
 dotenv.config();
 const router = express.Router();
 
@@ -14,26 +14,32 @@ router.post("/register", async (req, res) => {
     const { name, username, password, age, college, email } = req.body;
 
     // check if user already exists
-    const [existing] = await pool.query(
-      "SELECT * FROM users WHERE username = ? OR email = ?",
-      [username, email]
-    );
-    if (existing.length > 0) {
+    const existing = await User.findOne({
+      $or: [{ username }, { email }]
+    });
+    if (existing) {
       return res.status(400).json({ message: "Username or Email already taken" });
     }
 
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // insert new user
-    const [result] = await pool.query(
-      "INSERT INTO users (name, username, password, age, college, email) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, username, hashedPassword, age, college, email]
-    );
+    // create new user document
+    const newUser = new User({
+      name,
+      username,
+      password: hashedPassword,
+      age,
+      college,
+      email,
+      role: "user" // optional since default is "user"
+    });
+
+    const savedUser = await newUser.save();
 
     // generate JWT
     const token = jwt.sign(
-      { id: result.insertId, username, role: "user" },
+      { id: savedUser._id, username: savedUser.username, role: savedUser.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
@@ -48,7 +54,7 @@ router.post("/register", async (req, res) => {
 
     res.status(201).json({
       message: "User registered successfully",
-      userId: result.insertId,
+      userId: savedUser._id, // Mongo uses _id instead of insertId
     });
   } catch (error) {
     console.error("Register error:", error);
@@ -60,16 +66,13 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
+    
 
     // check if user exists
-    const [rows] = await pool.query("SELECT * FROM users WHERE username = ?", [
-      username,
-    ]);
-    if (rows.length === 0) {
+    const user = await User.findOne({ username });
+    if (!user) {
       return res.status(400).json({ message: "Invalid username or password" });
     }
-
-    const user = rows[0];
 
     // compare password
     const isMatch = await bcrypt.compare(password, user.password);
@@ -79,7 +82,7 @@ router.post("/login", async (req, res) => {
 
     // generate token
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { id: user._id, username: user.username, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
@@ -89,18 +92,19 @@ router.post("/login", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 12 * 60 * 60 * 1000,
+      maxAge: 12 * 60 * 60 * 1000, // 12 hours
     });
 
     res.json({
       message: "Login successful",
-      user: { id: user.id, username: user.username, role: user.role },
+      user: { id: user._id, username: user.username, role: user.role },
     });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 // GET current logged-in user
 router.get("/me", async (req, res) => {
   try {
@@ -110,19 +114,20 @@ router.get("/me", async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const [rows] = await pool.query("SELECT id, username, role, name, email FROM users WHERE id = ?", [decoded.id]);
 
-    if (rows.length === 0) {
+    const user = await User.findById(decoded.id).select("id username role name email");
+    if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
 
-    res.json({ user: rows[0] });
+    res.json({ user });
   } catch (err) {
     console.error("Auth check error:", err);
     res.status(401).json({ message: "Invalid token" });
   }
 });
 
+// LOGOUT
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -131,5 +136,6 @@ router.post("/logout", (req, res) => {
   });
   res.json({ message: "Logged out successfully" });
 });
+
 
 module.exports = router;

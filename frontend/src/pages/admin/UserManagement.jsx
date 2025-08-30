@@ -181,7 +181,7 @@ const UserManagement = () => {
         delete userData.password;
       }
       
-      await api.updateUser(selectedUser.id, userData);
+      await api.updateUser(selectedUser._id, userData);
       await fetchUsers();
       
       setShowEditModal(false);
@@ -196,7 +196,7 @@ const UserManagement = () => {
 
   const handleDeleteUser = async () => {
     try {
-      await api.deleteUser(selectedUser.id);
+      await api.deleteUser(selectedUser._id);
       await fetchUsers();
       
       setShowDeleteModal(false);
@@ -275,9 +275,7 @@ const UserManagement = () => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="ghost" icon={<EyeIcon className="w-4 h-4" />}>
-            View
-          </Button>
+          
           <Button 
             size="sm" 
             variant="outline" 
@@ -286,7 +284,7 @@ const UserManagement = () => {
           >
             Edit
           </Button>
-          {user.id !== currentUser.id && (
+          {user._id !== currentUser._id && (
             <Button
               size="sm"
               variant="danger"

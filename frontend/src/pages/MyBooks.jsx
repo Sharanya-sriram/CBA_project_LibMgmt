@@ -28,46 +28,31 @@ const MyBooks = () => {
       try {
         setLoading(true);
         const issuedBooksResponse = await api.getIssuedBooks();
+        console.log(issuedBooksResponse.data);
+        console.log(user._id);
+        
         
         const userBooks = issuedBooksResponse.data.filter(
-          issuedBook => issuedBook.userId === user.id
+          issuedBook => issuedBook.userId.toString() === user._id.toString()
         );
         
-        const booksWithDetails = await Promise.all(
-          userBooks.map(async (issuedBook) => {
-            try {
-              const bookResponse = await api.getBook(issuedBook.bookId);
-              return {
-                ...issuedBook,
-                title: bookResponse.data.title,
-                author: bookResponse.data.author,
-                genre: bookResponse.data.genre,
-                description: bookResponse.data.description,
-                dueDate: calculateDueDate(issuedBook.issueDate),
-                status: issuedBook.returnDate ? "returned" : "issued",
-                renewalCount: 0,
-                maxRenewals: 2,
-                fine: 0,
-                coverColor: getRandomCoverColor()
-              };
-            } catch (error) {
-              console.error(`Failed to fetch book ${issuedBook.bookId}:`, error);
-              return {
-                ...issuedBook,
-                title: `Book ID ${issuedBook.bookId}`,
-                author: "Unknown",
-                genre: "Unknown",
-                description: "Book details not available",
-                dueDate: calculateDueDate(issuedBook.issueDate),
-                status: issuedBook.returnDate ? "returned" : "issued",
-                renewalCount: 0,
-                maxRenewals: 2,
-                fine: 0,
-                coverColor: "from-gray-500 to-gray-700"
-              };
-            }
-          })
-        );
+        const booksWithDetails = userBooks.map((issuedBook) => {
+          const book = issuedBook.bookId;
+          return {
+            ...issuedBook,
+            title: book.title,
+            author: book.author,
+            genre: book.genre,
+            description: book.description,
+            dueDate: calculateDueDate(issuedBook.issueDate),
+            status: issuedBook.returnDate ? "returned" : "issued",
+            renewalCount: 0,
+            maxRenewals: 2,
+            fine: 0,
+            coverColor: getRandomCoverColor()
+          };
+        });
+        
         
         setMyBooks(booksWithDetails.filter(book => !book.returnDate));
       } catch (error) {
@@ -79,7 +64,7 @@ const MyBooks = () => {
     };
     
     fetchMyBooks();
-  }, [user.id]);
+  }, [user._id]);
   
   const calculateDueDate = (issueDate) => {
     const issue = new Date(issueDate);
@@ -127,12 +112,12 @@ const MyBooks = () => {
 
   const confirmReturn = async () => {
     try {
-      await api.updateIssuedBook(selectedBook.id, {
+      await api.updateIssuedBook(selectedBook._id, {
         ...selectedBook,
         issueDate:new Date(selectedBook.issueDate).toISOString().split('T')[0],
         returnDate: new Date().toISOString().split('T')[0]
       });
-      setMyBooks(prev => prev.filter(book => book.id !== selectedBook.id));
+      setMyBooks(prev => prev.filter(book => book._id !== selectedBook._id));
       setShowReturnModal(false);
       setSelectedBook(null);
       alert(`✅ Book "${selectedBook.title}" returned successfully!`);
@@ -144,10 +129,10 @@ const MyBooks = () => {
 
   const handleRenewBook = (bookId) => {
     setMyBooks(prev => prev.map(book => 
-      book.id === bookId 
+      book._id === bookId 
         ? { 
             ...book, 
-            dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            dueDate: new Date(new Date(book.dueDate).getTime() + 30 * 24 * 60 * 60 * 1000),
             renewalCount: book.renewalCount + 1 
           }
         : book
@@ -166,7 +151,7 @@ const MyBooks = () => {
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <h3 className="font-bold text-lg text-white dark:text-gray-900 line-clamp-1">
+              <h3 className="font-bold text-lg text-gray-800 dark:text-white line-clamp-1">
                 {book.title}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">by {book.author}</p>
@@ -216,7 +201,7 @@ const MyBooks = () => {
               Return Book
             </Button>
             {book.renewalCount < book.maxRenewals && !isOverdue(book.dueDate) && (
-              <Button size="sm" variant="outline" onClick={() => handleRenewBook(book.id)}>
+              <Button size="sm" variant="outline" onClick={() => handleRenewBook(book._id)}>
                 Renew
               </Button>
             )}
@@ -235,7 +220,8 @@ const MyBooks = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center bg-gray-900 dark:bg-gray-50`}>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -299,7 +285,7 @@ const MyBooks = () => {
   
         <div className="space-y-6">
           {myBooks.length > 0 ? (
-            myBooks.map(book => <BookCard key={book.id} book={book} />)
+            myBooks.map(book => <BookCard key={book._id} book={book} />)
           ) : (
             <Card className="text-center py-12">
               <BookOpenIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />

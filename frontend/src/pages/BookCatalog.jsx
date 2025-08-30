@@ -148,7 +148,7 @@ const BookCatalog = () => {
         const booksWithCopies = await Promise.all(
           response.data.map(async (book) => {
             // Fetch real copies for this book
-            const copiesRes = await api.getCopiesByBookId(book.id);
+            const copiesRes = await api.getCopiesByBookId(book._id);
 
             return {
               ...book,

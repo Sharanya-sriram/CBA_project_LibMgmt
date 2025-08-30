@@ -75,8 +75,8 @@ const IssueManagement = () => {
       ]);
 
       const issuedBooksData = issuedResponse.data.map(issue => {
-        const book = booksResponse.data.find(b => b.id === issue.bookId);
-        const user = usersResponse.data.find(u => u.id === issue.userId);
+        const book = issue.bookId;
+        const user = usersResponse.data.find(u => u._id === issue.userId);
         
         return {
           ...issue,
@@ -127,8 +127,8 @@ const IssueManagement = () => {
   const handleIssueBook = async () => {
     try {
       await api.addIssuedBook({
-        userId: parseInt(issueForm.userId),
-        bookId: parseInt(issueForm.bookId),
+        userId: issueForm.userId,
+        bookId: issueForm.bookId,
         copyId: issueForm.copyId,
         issueDate: issueForm.issueDate,
         returnDate: null
@@ -146,7 +146,7 @@ const IssueManagement = () => {
 
   const handleReturnBook = async () => {
     try {
-      await api.updateIssuedBook(selectedIssue.id, {
+      await api.updateIssuedBook(selectedIssue._id, {
         ...selectedIssue,
         returnDate: new Date().toISOString().split('T')[0]
       });
@@ -163,7 +163,7 @@ const IssueManagement = () => {
 
   const handleDeleteIssueRecord = async () => {
     try {
-      await api.deleteIssuedBook(selectedIssue.id);
+      await api.deleteIssuedBook(selectedIssue._id);
       await fetchData();
       
       setShowDeleteModal(false);
@@ -447,7 +447,7 @@ const IssueManagement = () => {
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredIssues.length > 0 ? (
                   filteredIssues.map((issue, index) => (
-                    <IssueRow key={issue.id} issue={issue} index={index} />
+                    <IssueRow key={issue._id} issue={issue} index={index} />
                   ))
                 ) : (
                   <tr>
@@ -483,7 +483,7 @@ const IssueManagement = () => {
                 >
                   <option value="">Select user</option>
                   {users.map(user => (
-                    <option key={user.id} value={user.id}>
+                    <option key={user._id} value={user._id}>
                       {user.name} (@{user.username})
                     </option>
                   ))}
@@ -502,7 +502,7 @@ const IssueManagement = () => {
                 >
                   <option value="">Select book</option>
                   {books.map(book => (
-                    <option key={book.id} value={book.id}>
+                    <option key={book._id} value={book._id}>
                       {book.title} by {book.author}
                     </option>
                   ))}
@@ -650,7 +650,7 @@ const IssueManagement = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Book ID</label>
-                    <p className="text-gray-900 dark:text-white">{selectedIssue.bookId}</p>
+                    <p className="text-gray-900 dark:text-white">{selectedIssue.bookId._id}</p>
                   </div>
                 </div>
               </div>

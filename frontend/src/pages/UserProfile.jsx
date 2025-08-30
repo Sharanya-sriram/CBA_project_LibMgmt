@@ -44,7 +44,7 @@ const UserProfile = () => {
     confirmPassword: ""
   });
 
-  const userId = id || currentUser.id; // Use URL param if available, otherwise current user
+  const userId = id || currentUser._id; // Use URL param if available, otherwise current user
 
   useEffect(() => {
     fetchUserData();
@@ -71,30 +71,19 @@ const UserProfile = () => {
       try {
         const issuedBooksResponse = await api.getIssuedBooks();
         const userIssuedBooks = issuedBooksResponse.data.filter(
-          issue => issue.userId === parseInt(userId)
+          issue => issue.userId === userId
         );
         
         // Enrich with book details
-        const booksWithDetails = await Promise.all(
-          userIssuedBooks.map(async (issue) => {
-            try {
-              const bookResponse = await api.getBook(issue.bookId);
-              return {
-                ...issue,
-                bookTitle: bookResponse.data.title,
-                bookAuthor: bookResponse.data.author,
-                dueDate: calculateDueDate(issue.issueDate)
-              };
-            } catch (error) {
-              return {
-                ...issue,
-                bookTitle: `Book ID ${issue.bookId}`,
-                bookAuthor: "Unknown",
-                dueDate: calculateDueDate(issue.issueDate)
-              };
-            }
-          })
-        );
+        const booksWithDetails = userIssuedBooks.map((issue) => {
+          const book = issue.bookId || {};
+          return {
+            ...issue,
+            bookTitle: book.title || `Book ID ${issue.bookId}`,
+            bookAuthor: book.author || "Unknown",
+            dueDate: calculateDueDate(issue.issueDate),
+          };
+        });
         
         setUserBooks(booksWithDetails);
       } catch (error) {
@@ -251,7 +240,7 @@ const UserProfile = () => {
                   icon={user.role === "admin" ? <ShieldCheckIcon className="w-4 h-4" /> : <UserIcon className="w-4 h-4" />}
                   className="mb-6"
                 >
-                  {user.role === "admin" ? "Administrator" : "Library Member"}
+                  {user.role === "admin" ? "Administrator" : "User"}
                 </Badge>
 
                 {/* Action Buttons - Only for own profile */}

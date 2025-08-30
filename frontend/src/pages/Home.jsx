@@ -66,10 +66,11 @@ const Home = () => {
             api.getIssuedBooks(),
           ]);
 
-
+          
           const booksWithCopies = await Promise.all(
             booksResponse.data.map(async (book) => {
-              const copiesResponse = await api.getCopiesByBookId(`${book.id}`);
+              const copiesResponse = await api.getCopiesByBookId(`${book._id}`);
+              // console.log(copiesResponse.data);
               return {
                 ...book,
                 copies: copiesResponse.data,  // 👈 now real copies
@@ -81,11 +82,12 @@ const Home = () => {
           );
           
           setBooks(booksWithCopies);
+          console.log(booksWithCopies);
 
         // Calculate real statistics
         setStats({
           totalBooks: booksResponse.data.length,
-          availableBooks: booksResponse.data.reduce(
+          availableBooks: booksWithCopies.reduce(
             (acc, book) =>
               acc + (book.copies?.filter((copy) => copy.available).length || 0),
             0
@@ -245,7 +247,7 @@ const Home = () => {
           />
           <StatCard
             icon={CheckCircleIcon}
-            title="Available Books"
+            title="Available Book copies"
             value={stats.availableBooks.toLocaleString()}
             color="emerald"
           />
@@ -287,7 +289,7 @@ const Home = () => {
                   ? featuredBooks
                   : featuredBooks.slice(0, 2)
                 ).map((book) => (
-                  <BookCard key={book.id} book={book} />
+                  <BookCard key={book._id} book={book} />
                 ))}
               </div>
             </div>
@@ -327,7 +329,7 @@ const Home = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {filteredBooks.length > 0 ? (
                   filteredBooks.map((book) => (
-                    <BookCard key={book.id} book={book} />
+                    <BookCard key={book._id} book={book} />
                   ))
                 ) : (
                   <div className="col-span-2 text-center py-12">

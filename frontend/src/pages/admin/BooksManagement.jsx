@@ -60,7 +60,7 @@ const BookForm = React.memo(({ title, bookForm, onFormChange, onSubmit, onCancel
       </div>
       <Input
         label="Publication Date"
-        type="date"
+        type="number"
         value={bookForm.publicationDate}
         onChange={(e) => onFormChange('publicationDate', e.target.value)}
         required
@@ -74,24 +74,20 @@ const BookForm = React.memo(({ title, bookForm, onFormChange, onSubmit, onCancel
         required
       />
     </div>
+    <div className="mb-4">
+  
+  <Input
+  label="Number of Copies"
+  type="number"
+  min="1"
+  value={bookForm.copies}
+  onChange={(e) => onFormChange("copies", e.target.value)}
+  placeholder="Enter number of copies"
+  required
+/>
+</div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Input
-        label="ISBN"
-        value={bookForm.isbn}
-        onChange={(e) => onFormChange('isbn', e.target.value)}
-        placeholder="978-0-123456-78-9"
-        required
-      />
-      <Input
-        label="Number of Copies"
-        type="number"
-        min="1"
-        value={bookForm.copies}
-        onChange={(e) => onFormChange('copies', e.target.value)}
-        required
-      />
-    </div>
+    
 
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -222,16 +218,24 @@ const BooksManagement = () => {
       const response = await api.getBooks();
       
       // Process books data with copy information
-      const booksWithCopies = response.data.map(book => ({
-        ...book,
-        totalCopies: book.copies?.length || 0,
-        availableCopies: book.copies?.filter(copy => copy.available).length || 0,
-        issuedCopies: book.copies?.filter(copy => !copy.available).length || 0,
-        addedDate: book.createdAt || new Date().toISOString().split('T')[0],
-        lastUpdated: book.updatedAt || new Date().toISOString().split('T')[0],
-        isbn: book.isbn || `978-${Math.floor(Math.random() * 10000000000)}`,
-        pages: book.pages || Math.floor(200 + Math.random() * 500)
-      }));
+      // ✅ This will work
+const booksWithCopies = await Promise.all(
+  response.data.map(async (book) => {
+    const { data: copies } = await api.getCopiesByBookId(book._id);
+
+    return {
+      ...book,
+      totalCopies: copies?.length || 0,
+      availableCopies: copies?.filter(copy => copy.available).length || 0,
+      issuedCopies: copies?.filter(copy => !copy.available).length || 0,
+      addedDate: book.createdAt || new Date().toISOString().split("T")[0],
+      lastUpdated: book.updatedAt || new Date().toISOString().split("T")[0],
+      isbn: book.isbn || `978-${Math.floor(Math.random() * 10000000000)}`,
+      pages: book.pages || Math.floor(200 + Math.random() * 500),
+    };
+  })
+);
+
       
       setBooks(booksWithCopies);
     } catch (error) {
@@ -263,7 +267,7 @@ const BooksManagement = () => {
       };
       
       const bookResponse = await api.addBook(bookData);
-      const newBookId = bookResponse.data.id;
+      const newBookId = bookResponse.data._id;
       
       // Create copies for the book
       const copyPromises = [];
@@ -300,7 +304,7 @@ const BooksManagement = () => {
         description: bookForm.description
       };
       
-      await api.updateBook(selectedBook.id, bookData);
+      await api.updateBook(selectedBook._id, bookData);
       
       // Refresh books list
       await fetchBooks();
@@ -320,13 +324,13 @@ const BooksManagement = () => {
       // Delete all copies first
       if (selectedBook.copies && selectedBook.copies.length > 0) {
         const deletePromises = selectedBook.copies.map(copy => 
-          api.deleteCopy(copy.id)
+          api.deleteCopy(copy._id)
         );
         await Promise.all(deletePromises);
       }
       
       // Delete the book
-      await api.deleteBook(selectedBook.id);
+      await api.deleteBook(selectedBook._id);
       
       // Refresh books list
       await fetchBooks();
@@ -415,9 +419,7 @@ const BooksManagement = () => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="ghost" icon={<EyeIcon className="w-4 h-4" />}>
-            View
-          </Button>
+          
           <Button 
             size="sm" 
             variant="outline" 

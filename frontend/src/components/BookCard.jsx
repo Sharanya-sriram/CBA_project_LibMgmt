@@ -12,7 +12,7 @@ const BookCard = ({ book, showActions = true, className = "" }) => {
   
   // Mock data for demo - replace with actual book data
   const bookData = {
-    id: book?.id || 1,
+    id: book?._id || 1,
     title: book?.title || "Sample Book Title",
     author: book?.author || "Unknown Author",
     genre: book?.genre || "Fiction",

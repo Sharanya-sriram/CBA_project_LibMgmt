@@ -1,6 +1,6 @@
 // src/api/http-common.js
 import axios from "axios";
-
+// ${import.meta.env.VITE_API_URL}
 const API = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}/api`, // Backend API base
   headers: {

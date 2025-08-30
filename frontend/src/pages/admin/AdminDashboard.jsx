@@ -109,13 +109,13 @@ const AdminDashboard = () => {
           .slice(-5)
           .reverse()
           .map(issuedBook => {
-            const book = books.find(b => b.id === issuedBook.bookId);
-            const user = users.find(u => u.id === issuedBook.userId);
+            const book = books.find(b => b._id === issuedBook.bookId._id);
+            const user = users.find(u => u._id === issuedBook.userId);
             
             return {
               type: issuedBook.returnDate ? "book_returned" : "book_issued",
-              user: user?.name || `User ${issuedBook.userId}`,
-              book: book?.title || `Book ${issuedBook.bookId}`,
+              user: user?.name || `User ${issuedBook.userId.username}`,
+              book: book?.title || `Book ${issuedBook.bookId.title}`,
               time: getTimeAgo(issuedBook.returnDate || issuedBook.issueDate)
             };
           });

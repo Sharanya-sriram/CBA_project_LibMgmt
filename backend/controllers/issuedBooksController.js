@@ -1,12 +1,16 @@
-const pool = require("../config/db");
-
+const IssuedBook= require("../models/IssuedBooks");
+const Copy = require("../models/Copy");
 // Get all issued books
 exports.getAllIssuedBooks = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM issuedBooks");
-    res.json(rows);
+    // fetch all issued books, with optional population of user and book
+    const issuedBooks = await IssuedBook.find()
+     // populate selected user fields
+      .populate("bookId");  // populate selected book fields
+
+    res.json(issuedBooks);
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching issued books:", err);
     res.status(500).json({ message: "Failed to get issued books" });
   }
 };
@@ -15,18 +19,24 @@ exports.getAllIssuedBooks = async (req, res) => {
 exports.getIssuedBookById = async (req, res) => {
   const { id } = req.params;
   try {
-    const [rows] = await pool.query("SELECT * FROM issuedBooks WHERE id = ?", [id]);
-    if (rows.length === 0) {
+    const issuedBook = await IssuedBook.findById(id)
+      .populate("userId", "username email") // optional: show related user
+      .populate("bookId", "title author");  // optional: show related book
+
+    if (!issuedBook) {
       return res.status(404).json({ message: "Issued book not found" });
     }
-    res.json(rows[0]);
+
+    res.json(issuedBook);
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching issued book by ID:", err);
     res.status(500).json({ message: "Failed to get issued book" });
   }
 };
 
 // Create a new issued book entry (issue a copy)
+
+
 exports.createIssuedBook = async (req, res) => {
   const { userId, bookId, copyId, issueDate, returnDate = null } = req.body;
 
@@ -35,21 +45,39 @@ exports.createIssuedBook = async (req, res) => {
   }
 
   try {
-    // Insert issued book record
-    const [result] = await pool.query(
-      `INSERT INTO issuedBooks (userId, bookId, copyId, issueDate, returnDate) VALUES (?, ?, ?, ?, ?)`,
-      [userId, bookId, copyId, issueDate, returnDate]
-    );
+    // 1. Check if the copy is available
+    const copy = await Copy.findOne({ copyId });
+    if (!copy) {
+      return res.status(404).json({ message: "Copy not found" });
+    }
+    if (!copy.available) {
+      return res.status(400).json({ message: "Copy is already issued" });
+    }
 
-    // Also update copy availability to 0 (unavailable)
-    await pool.query(`UPDATE copies SET available = 0 WHERE copyId = ?`, [copyId]);
+    // 2. Create issued book record
+    const issuedBook = new IssuedBook({
+      userId,
+      bookId,
+      copyId,
+      issueDate,
+      returnDate,
+    });
+    const savedIssuedBook = await issuedBook.save();
 
-    res.status(201).json({ id: result.insertId, message: "Book copy issued successfully" });
+    // 3. Update copy availability to false (unavailable)
+    copy.available = false;
+    await copy.save();
+
+    res.status(201).json({
+      id: savedIssuedBook._id,
+      message: "Book copy issued successfully",
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Error issuing book:", err);
     res.status(500).json({ message: "Failed to issue book copy" });
   }
 };
+
 
 // Update issued book (e.g. to add returnDate)
 exports.updateIssuedBook = async (req, res) => {
@@ -57,54 +85,63 @@ exports.updateIssuedBook = async (req, res) => {
   const { userId, bookId, copyId, issueDate, returnDate } = req.body;
 
   try {
-    // Update issuedBooks table
-    const modIssueDate = issueDate ? new Date(issueDate).toISOString().slice(0, 10) : null;
-    console.log(modIssueDate);
-    const [result] = await pool.query(
-      `UPDATE issuedBooks SET userId = ?, bookId = ?, copyId = ?, issueDate = ?, returnDate = ? WHERE id = ?`,
-      [userId, bookId, copyId, modIssueDate, returnDate, id]
+    // Format issueDate if provided
+    const modIssueDate = issueDate ? new Date(issueDate) : null;
+
+    // 1. Update issued book document
+    const issuedBook = await IssuedBook.findByIdAndUpdate(
+      id,
+      {
+        userId,
+        bookId,
+        copyId,
+        issueDate: modIssueDate,
+        returnDate,
+      },
+      { new: true } // return updated document
     );
 
-
-    if (result.affectedRows === 0) {
+    if (!issuedBook) {
       return res.status(404).json({ message: "Issued book not found" });
     }
 
-    // If returnDate is set, mark copy available again
-    if (returnDate) {
-      await pool.query(`UPDATE copies SET available = 1 WHERE copyId = ?`, [copyId]);
+    // 2. If returnDate is set, mark copy available again
+    if (returnDate && copyId) {
+      await Copy.findOneAndUpdate({ copyId }, { available: true });
     }
 
-    res.json({ message: "Issued book updated" });
+    res.json({ message: "Issued book updated", issuedBook });
   } catch (err) {
-    console.error(err);
+    console.error("Error updating issued book:", err);
     res.status(500).json({ message: "Failed to update issued book" });
   }
 };
 
 // Delete an issued book entry (return book)
+// controllers/issuedBookController.js
 exports.deleteIssuedBook = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Find the issued book entry to get copyId
-    const [rows] = await pool.query(`SELECT copyId FROM issuedBooks WHERE id = ?`, [id]);
-
-    if (rows.length === 0) {
+    // 1. Find issued book first (to get copyId)
+    const issuedBook = await IssuedBook.findById(id);
+    if (!issuedBook) {
       return res.status(404).json({ message: "Issued book not found" });
     }
 
-    const { copyId } = rows[0];
+    const { copyId } = issuedBook;
 
-    // Delete the issued book record
-    const [result] = await pool.query(`DELETE FROM issuedBooks WHERE id = ?`, [id]);
+    // 2. Delete issued book record
+    await IssuedBook.findByIdAndDelete(id);
 
-    // Mark the copy available again
-    await pool.query(`UPDATE copies SET available = 1 WHERE copyId = ?`, [copyId]);
+    // 3. Mark the copy available again
+    if (copyId) {
+      await Copy.findOneAndUpdate({ copyId }, { available: true });
+    }
 
     res.json({ message: "Issued book deleted (book returned)" });
   } catch (err) {
-    console.error(err);
+    console.error("Error deleting issued book:", err);
     res.status(500).json({ message: "Failed to delete issued book" });
   }
 };

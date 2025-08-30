@@ -1,5 +1,6 @@
+const { default: mongoose } = require("mongoose");
 const Book = require("../models/Book");
-
+const Copy = require("../models/Copy");
 // 📚 Get all books
 exports.getBooks = async (req, res) => {
   try {
@@ -9,7 +10,23 @@ exports.getBooks = async (req, res) => {
     res.status(500).json({ message: "Error fetching books", error });
   }
 };
+exports.getBookById = async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    if (!book) return res.status(404).json({ message: "Book not found" });
 
+    // Convert string to ObjectId when querying copies
+    const copies = await Copy.find({ bookId: req.params.id });  
+
+    const result = book.toObject(); // convert Mongoose doc to plain object
+    result.copies = copies;
+
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching book", error: error.message });
+  }
+};
 // ➕ Add a new book
 exports.addBook = async (req, res) => {
   try {

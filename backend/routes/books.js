@@ -5,6 +5,8 @@ const booksController = require("../controllers/booksController");
 //  Get all books
 router.get("/", booksController.getBooks);
 
+//Get book by id
+router.get("/:id", booksController.getBookById);
 //  Add a book
 router.post("/", booksController.addBook);
 

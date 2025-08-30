@@ -1,5 +1,5 @@
 const User = require("../models/User");
-
+const bcrypt = require("bcryptjs");
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
@@ -27,11 +27,16 @@ exports.getUserById = async (req, res) => {
 // Create a new user
 exports.createUser = async (req, res) => {
   const { name, username, password, age, college, email, role } = req.body;
+
   try {
+    // hash password before saving
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = new User({
       name,
       username,
-      password,
+      password: hashedPassword,
       age,
       college,
       email,
@@ -39,9 +44,10 @@ exports.createUser = async (req, res) => {
     });
 
     await newUser.save();
+
     res.status(201).json({ id: newUser._id, message: "User created" });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error creating user:", err);
     res.status(500).json({ message: "Failed to create user" });
   }
 };
@@ -50,20 +56,29 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
-      new: true,
-    }).select("-password");
+    const updateData = { ...req.body };
 
-    if (!updatedUser)
+    // if password is included, hash it
+    if (updateData.password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(updateData.password, salt);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true, // ensures schema validation on update
+    }).select("-password"); // never return password
+
+    if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
+    }
 
     res.json({ message: "User updated", user: updatedUser });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error updating user:", err);
     res.status(500).json({ message: "Failed to update user" });
   }
 };
-
 // Delete a user
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
