@@ -44,7 +44,7 @@ const UserProfile = () => {
     confirmPassword: ""
   });
 
-  const userId = id || currentUser._id; // Use URL param if available, otherwise current user
+  const userId = id || currentUser.id; // Use URL param if available, otherwise current user
 
   useEffect(() => {
     fetchUserData();

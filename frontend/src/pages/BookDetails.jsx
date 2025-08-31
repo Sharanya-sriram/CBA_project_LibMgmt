@@ -24,7 +24,7 @@ const BookDetails = () => {
 
   const handleIssue = async (copyId) => {
     try {
-      console.log(user);
+      console.log(user.id);
       const newIssue = {
         userId: user.id,
         bookId: id,
